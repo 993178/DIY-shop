@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <h1>Gebruikersprofiel</h1>
+        <hr>
+        <h2>Bestellingen</h2>
+        {{#each orders }}
+        {{!-- each order is zeg maar een volle shopping-cart --}}
+            <div class="card text-center">
+                <div class="card-body">
+                    <ul class="list-group">
+                        {{#each this.items }}
+                        {{!-- dit is hetzelfde 'items' als in order.items in regel 21 in user.js, dus dit gaat over de individuele items op het lijstje van één zo'n order/shopping-cart --}}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ this.item.title }} | {{ this.qty }} stuks
+                                <span class="badge badge-primary badge-pill">€{{ this.price }}</span>
+                                {{!-- dus bij title is het item.title, want die komt helemaal bij product vandaan, maar de price staat én daar én ook een niveau hoger in de cart (qty staat daar ook), vandaar daar geen .item. --}}
+                            </li>
+                        {{/each}}
+                    </ul>
+                </div>
+                <div class="card-footer"><strong>Totaalbedrag: €{{ this.cart.totalPrice }}</strong></div>
+            </div>
+        {{/each}}
+
+    </div>
+</div>
+
+

@@ -1,0 +1,107 @@
+{{!-- <div class="row">
+    <div class="col-sm-6 col-md-4 col-md-offset-4 col-sm-offset-3">
+        <h1>Afrekenen</h1>
+        <h4>Totaalbedrag: €{{ total }}</h4>
+        <div class="alert alert-danger {{#if noError}}hidden{{/if}}" id="charge-error" >
+            {{errMsg}}
+        </div>
+        <form id="payment-form">
+            <div class="form-row">
+                <label for="name">
+                Name
+                </label>
+                <input name="name">
+            </div>
+
+            <div class="form-row">
+                <label for="ideal-bank-element">
+                iDEAL Bank
+                </label>
+                <div id="ideal-bank-element">
+                <!-- A Stripe Element will be inserted here. -->
+                </div>
+            </div>
+
+            <button>Submit Payment</button>
+
+            <!-- Used to display form errors. -->
+            <div id="error-message" role="alert"></div>
+        </form>
+    </div>
+</div> --}}
+
+{{!-- <script src="https://js.stripe.com/v3/"></script> --}}
+{{!-- Stripe raadt aan deze regel op elke pagina bij te sluiten zodat zij de boel beter kunnen beveiligen --}}
+
+{{!-- <script src="javascripts/checkout.js"></script> --}}
+{{!-- we gebruiken Stripe-dingen in checkout.js, dus hier eerst stripe en dan checkout --}}
+
+<script src="https://js.stripe.com/v3/"></script>
+
+        <form action="/checkout" method="post" id="checkout-form">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="name">Naam</label>
+                        <input type="text" id="name" class="form-control" required name="name">
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="straat">Straat</label>
+                        <input type="text" id="straat" class="form-control" required name="straat">
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="huisnummer">huisnummer</label>
+                        <input type="text" id="huisnummer" class="form-control" required name="huisnummer">
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="toevoeging">toevoeging</label>
+                        <input type="text" id="toevoeging" class="form-control" name="toevoeging">
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="postcode">postcode</label>
+                        <input type="text" id="postcode" class="form-control" required name="postcode">
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="plaatsnaam">plaatsnaam</label>
+                        <input type="text" id="plaatsnaam" class="form-control" required name="plaatsnaam">
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Buy now</button>
+        </form>
+
+
+<form id="payment-form">
+  {{!-- <div class="form-row">
+    <label for="name">
+      Naam
+    </label>
+    <input id="name" name="name" placeholder="Jenny Rosen" required>
+  </div> --}}
+
+  <div class="form-row">
+    <label for="ideal-bank-element">
+      iDEAL Bank
+    </label>
+    <div style='width: 30em' id="ideal-bank-element">
+      <!-- A Stripe Element will be inserted here. -->
+    </div>
+  </div>
+
+  <button>Submit Payment</button>
+
+  <!-- Used to display form errors. -->
+    <div id="error-message" role="alert"></div>
+</form>
+
+<script src="javascripts/checkout.js"></script>
