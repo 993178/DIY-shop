@@ -1,0 +1,53 @@
+<h1>Toevoegen product mbt ijzerwaren</h1>
+
+<p>een of ander formulier voor de data, met de relevante velden</p>
+
+<form action="/user/ijzerwaren" method="post" id="checkout-form">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="plaatje">url plaatje</label>
+                <input type="text" id="plaatje" class="form-control" name="plaatje">
+            </div>
+        </div>
+
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="soort">Soort ijzerwaar</label>
+                <input type="text" id="soort" class="form-control" name="soort">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="beschrijving">Beschrijving, typenummers, weet ik veel iets</label>
+                <input type="text" id="beschrijving" class="form-control" name="beschrijving">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="grootte">Grootte/lengte</label>
+                <input type="text" id="grootte" class="form-control" name="grootte">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="materiaal">Kleur/materiaal</label>
+                <input type="text" id="materiaal" class="form-control" name="materiaal">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="aantal">Aantal per eenheid</label>
+                <input type="text" id="aantal" class="form-control" name="aantal">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="prijs">prijs</label>
+                <input type="number" id="prijs" class="form-control" name="prijs">
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <button type="submit" class="btn btn-success">Opslaan</button>
+</form>

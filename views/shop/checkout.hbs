@@ -38,6 +38,15 @@
 
 <script src="https://js.stripe.com/v3/"></script>
 
+    <div class="col-sm-6 col-md-4 col-md-offset-4 col-sm-offset-3">
+        <h1>Afrekenen</h1>
+        <h4>Totaalbedrag: €{{ total }}</h4>
+        <div class="alert alert-danger hidden" id="charge-error" >
+            {{errMsg}}
+        </div>
+        {{!-- rondom de class hidden stond nog {{#if noError}} en {{/if}} --}}
+
+
         <form action="/checkout" method="post" id="checkout-form">
             <div class="row">
                 <div class="col-xs-12">
@@ -77,31 +86,6 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-success">Buy now</button>
+            <a href="/dokken" type="submit" class="btn btn-success">Opslaan, volgende</a>
         </form>
-
-
-<form id="payment-form">
-  {{!-- <div class="form-row">
-    <label for="name">
-      Naam
-    </label>
-    <input id="name" name="name" placeholder="Jenny Rosen" required>
-  </div> --}}
-
-  <div class="form-row">
-    <label for="ideal-bank-element">
-      iDEAL Bank
-    </label>
-    <div style='width: 30em' id="ideal-bank-element">
-      <!-- A Stripe Element will be inserted here. -->
     </div>
-  </div>
-
-  <button>Submit Payment</button>
-
-  <!-- Used to display form errors. -->
-    <div id="error-message" role="alert"></div>
-</form>
-
-<script src="javascripts/checkout.js"></script>

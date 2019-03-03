@@ -13,7 +13,6 @@ router.get('/', function(req, res, next) {
     for (var i = 0; i < docs.length; i+= chunkSize) {   // met iedere loop gaan we 3 omhoog: eerst 0, dan 3, dan 6 etc
       productChunks.push(docs.slice(i, i + chunkSize)); // in iedere loop snijden we een brok van 3 stuks uit de docs-array, beginnend bij i, eindigend vóór i + 3, en pushen dat brok in de productChunks-array
     }
-
     res.render('shop/index', { title: 'Shopping cart', products: productChunks, successMsg: successMsg, noMessage: !successMsg });  // renderfunctie met te renderen dingen, aangevuld met de products die hier docs heten. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
   });
 });
@@ -21,13 +20,11 @@ router.get('/', function(req, res, next) {
 router.get('/add-to-cart/:id', function(req, res, next) {   // Discount Jonas: next kun je altijd weglaten als je die niet gebruikt, hij zet hem neer want conventie
   var productId = req.params.id;
   var cart = new Cart(req.session.cart ? req.session.cart : { items: {}});  // nieuw karretje maken en daar oud karretje ingooien als argument - ALS die bestaat, anders een leeg object. Je kunt hier ook een mal van maken: {items: {}, totalQty: 0, totalPrice: 0} ipv de pipe operators in cart.js die Discount Jonas prefereert
-  console.log(cart);
   Product.findById(productId, function(err, product) {
     if (err) {
       return res.redirect('/');   // nogal summier - er gaat iets fout en je wordt teruggestuurd naar de homepage...
     }
     cart.add(product, product.id);
-    console.log(cart);
     req.session.cart = cart;    // wordt ook automatisch opgeslagen
     res.redirect('/');          // dus als het goed gaat, wordt je óók teruggestuurd naar de homepage...!! Lekker gebruikersvriendelijk
   });
@@ -77,6 +74,7 @@ router.get('/checkout', function(req, res, next) {    // komt vanaf shopping-car
   res.render('shop/checkout', {total: cart.totalPrice, errMsg: errMsg, noError: !errMsg});    // we geven errMsg door en checken in noError of ie falsy is, zo ja, dan is noError truthy en geeft checkout.hbs het error-element niet weer...
 });
 
+//deze functie zit nu nog gekoppeld aan /checkout, maar ik heb de betaalmodule zelf op een andere pagina gezet. Wat moet hier blijven en wat moet naar een POST-methode /dokken?
 router.post('/checkout', function(req, res, next) {   // isLoggedIn > dat je dus ingelogd moet zijn, zie de uit user.js gekopieerde functie onderaan
   if (!req.session.cart) {
     return res.redirect('/shopping-cart');    // als je geen cart hebt, optiefen
@@ -116,6 +114,9 @@ router.get('/geheim', function(req, res, next) {
   res.render('shop/geheim');
 })
 
+router.get('/dokken', function(req, res, next) {
+  res.render('shop/dokken');
+})
 
 module.exports = router;
 
@@ -127,7 +128,7 @@ module.exports = router;
 //   res.redirect('/user/signin');
 // };
 
-// wordt die oldUrl nou nog ergens hier gebruikt??
+// wordt die oldUrl nou nog ergens hier gebruikt??  > nee, in user.js
 
 
 
@@ -147,19 +148,28 @@ in winkelwagentje mogelijkheid toevoegen meer te kopen van een product
 in checkout formulier toevoegen voor naam en adres enzo
 adresgegevens toevoegen in Order.js
 op beheerpaginaview 'product toevoegen' neergezet en een dropdown toegevoegd voor het kiezen van een categorie product om toe te voegen...
+checkout houden als plek om adresgegevens in te vullen, maar iDeal op aparte volgende pagina doen (is vooral belangrijk als we de verzendkosten weten te regelen)
+view en router.get maken voor nieuwe beheerderspagina (...waarvan de /naam geheim moet blijven... dus dan moet ik hem niet op github zetten... voorlopig maar /geheim)
+op /geheim uitlogfunctie ook weer voorwaardelijk tonen
+inlog- en uitlogfunctie en profiel verplaatsen van navbar naar /geheim   > ja, maar link werkt niet
+kijken wat er nou mis is met die links, want ik kan vanaf /geheim niet meer op profiel en andere pagina's komen en da's niet handig
+checken of alles nog steeds werkt als ik de beveiliging weer aan zet (dummyversie isLoggedIn)  > ja, met next(); erin
+formulier gemaakt voor ijzerwaren view
+model gemaakt voor ijzerwaren
+postmethode gemaakt voor ijzerwaren, met new IJzerwaar enzo 
 
 Gepoogd: 
 
-view en router.get maken voor nieuwe beheerderspagina (...waarvan de /naam geheim moet blijven... dus dan moet ik hem niet op github zetten... voorlopig maar /geheim)
-inlog- en uitlogfunctie verplaatsen van navbar naar beheerderspagina. 
-uitlogfunctie ook weer voorwaardelijk tonen
+formulier gemaakt voor ijzerwaren view, model gemaakt voor ijzerwaren, postmethode gemaakt voor ijzerwaren 
+    > loopt vast op ontbrekend csrf token???! Why
+    okee, csrf-token toegevoegd bij formulier??? Lijkt me niet juist. Error weg, nu eeuwig laden
 
 Doen:
 
 
-
- 
-gebruikersprofiel ombouwen tot beheerderspagina voor Ria en Coen
+//PRODUCTEN BEHEREN
+iets in mongo database zetten via formulier
+iets uit mongo database verwijderen
 
 producten in categorieën onderbrengen... 
 huidige categorieën: beveiliging, zonwering, gereedschappen, ijzerwaren, tuinartikelen, sierbeslag  (slijpservice en sleutels lijken me niet langer van toepassing...)
@@ -171,9 +181,11 @@ formulier voor toevoegen van product...
 mogelijkheid product te verwijderen...
 
 
-//BESTELLINGEN
-checkout houden als plek om adresgegevens in te vullen, maar iDeal op aparte volgende pagina doen (is vooral belangrijk als we de verzendkosten weten te regelen)
+checken of alles nog steeds werkt als ik echt de beveiliging weer aan zet (echte versie isLoggedIn met isAuthenticated)
 
+//BESTELLINGEN
+
+checkout-POST controleren en kijken hoe en of die nog aansluit op wat er nu in de views gebeurt
 nadenken over hoe afhandelen bestelling moet verlopen... 
  > denk dat een e-mail naar R&C het handigst is voor ze, iets met 'er is op [datum, tijd] een/meerdere [naam producten] besteld, neem contact op via [mailadres of telefoonnummer]'
 mezelf een automatisch mail weten te sturen met de adresgegevens van de klant en zijn bestelling zou al heel wat zijn
@@ -202,53 +214,6 @@ Kleuren Coendoen:
  #5254a4 #55a darkslateblue hsl(238,33,48) rgb(82,84,164)
 
  #feab00 #fb0 orange hsl(40,100,49) rgb(254,171,0)
-
-
-
-
-Uiteindelijk moet het iets zijn waarmee R&C zelf uit de voeten kunnen en waarmee klanten zonder al te veel gedoe iets kunnen kopen.
-En waar geen ladingen onderhoud aan gepleegd hoeft te worden...
-
-
-
-
-index.js heeft nu de 'algemene' routes, user.js heeft inloggen en uitloggen enzo
-In de view-map zitten de eerste in shop (niet zichtbaar in het adres), de tweede in user (wel in adres)
-
-Ik wil een beheerderspagina zonder extra laag in het adres, maar die mag best doorverwijzen naar pagina's die dat wel hebben
-
-domein: 
--klant
--beheerder
--producten beheren?
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* 
-
-
-
-
-
-
-
-
-
-
-
 
 
 

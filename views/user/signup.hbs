@@ -11,11 +11,11 @@
         <form action="/user/signup" method="post">
             <div class="form-group">
                 <label for="email">E-mailadres</label>
-                <input type="text" id="email" name="email" class="form-control">
+                <input type="text" id="email" name="email" required class="form-control">
             </div>
             <div class="form-group">
                 <label for="password">Wachtwoord</label>
-                <input type="text" id="password" name="password" class="form-control">
+                <input type="text" id="password" name="password" required class="form-control">
             </div>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             <button type="submit" class="btn btn-primary">Maak account aan</button>

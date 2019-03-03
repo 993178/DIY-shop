@@ -1,0 +1,26 @@
+<script src="https://js.stripe.com/v3/"></script>
+
+<form id="payment-form">
+  {{!-- <div class="form-row">
+    <label for="name">
+      Naam
+    </label>
+    <input id="name" name="name" placeholder="Jenny Rosen" required>
+  </div> --}}
+
+  <div class="form-row" style="width: 75%">
+    <label style="width: 100%" for="ideal-bank-element">
+      iDEAL Bank
+    </label>
+    <div class="stripe-thing" style='width: 8.8rem; display: block' id="ideal-bank-element">
+      <!-- A Stripe Element will be inserted here. -->
+    </div>
+  </div>
+
+  <button>Doe betaling</button>
+
+  <!-- Used to display form errors. -->
+    <div id="error-message" role="alert"></div>
+</form>
+
+<script src="javascripts/checkout.js"></script>
