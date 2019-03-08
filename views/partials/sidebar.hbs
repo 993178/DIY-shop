@@ -1,0 +1,37 @@
+<navbar>
+    <div>
+        <a class="nav-item nav-link" href="/producten"><h1>Alle producten</h1></a>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="/producten?=tuinartikelen"><h2>Tuinartikelen</h2></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/producten?=dremel"><h2>Voor de Dremel</h2></a>
+            </li>
+
+            {{!-- {{if ijzerwarentekoop}} --}}
+            <li class="nav-item">
+                <a class="nav-link" href="/producten?=ijzerwaren"><h2>IJzerwaren</h2></a>
+            </li>
+            {{!-- {{/if}} --}}
+
+        </ul>
+
+    </div>
+</navbar>
+
+
+
+
+{{!-- 
+
+als ik nou hier per li iets van een {{if}} erin gooi die checkt OF product.find(category: [die categorie in die li]) ofzo
+iets oplevert, en hem alleen weergeef als dat meer is dan 0? Dus dan moet ik ergens in de js eerst al een variabele ofzo maken
+die een boolean oplevert, iets van ijzerwarentekoop = ijzerwaren > 0??
+
+Maar dat kan niet in de router.get van diezelfde pagina lijkt me, dat wordt een cirkelredenering.
+
+
+
+
+ --}}

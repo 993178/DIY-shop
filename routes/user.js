@@ -43,17 +43,23 @@ router.post('/ijzerwaren', function(req, res, next) {
     aantal: req.body.aantal,
     prijs: req.body.prijs
   });
-  console.log('kijk mij eens lekker schroefjes tellen');
-  console.log(ijzerwaar);
+  
   ijzerwaar.save(function (err, ijzerwr) {
     if (err) return console.error(err);
     console.log(ijzerwr.soort + " opgeslagen.");
+    res.redirect('/geheim')
   });
 });
 
 router.get('/beveiliging', isLoggedIn, function(req, res, next) {
   res.render('user/beveiliging');
 });
+
+// router.get('/producten/:category', isLoggedIn, function(req, res, next) {
+//   var category = req.params.category
+//   Product.find({ category: category })
+//   res.render('user/' + category);
+// });
 
 router.get('/zonwering', isLoggedIn, function(req, res, next) {
   res.render('user/zonwering');
