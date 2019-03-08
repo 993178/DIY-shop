@@ -29,53 +29,29 @@ router.get('/profile', isLoggedIn, function(req, res, next) {     // isLoggedIn 
   });
 });
 
-router.get('/ijzerwaren', isLoggedIn, function(req, res, next) { 
+router.get('/producterbij', isLoggedIn, function(req, res, next) { 
   res.render('user/ijzerwaren', {csrfToken: req.csrfToken()});
 });
 
-router.post('/ijzerwaren', function(req, res, next) {
-  var ijzerwaar = new IJzerwaar({
+router.post('/producterbij', function(req, res, next) {
+  var product = new Product({
+    categorie: req.body.categorie,
     imagePath: req.body.plaatje,
-    soort: req.body.soort,
-    beschrijving: req.body.beschrijving,
-    grootte: req.body.grootte,
-    materiaal: req.body.materiaal,
-    aantal: req.body.aantal,
-    prijs: req.body.prijs
+    titel: req.body.titel,
+    prijs: req.body.prijs,        // komt in centen! > iets mee doen in view. Of hier? kan dat
+    productDetails: req.body.productDetails
   });
   
-  ijzerwaar.save(function (err, ijzerwr) {
-    if (err) return console.error(err);
-    console.log(ijzerwr.soort + " opgeslagen.");
-    res.redirect('/geheim')
+  product.save(function (err, ding) {
+    if (err) return console.error(err);         // dit moet effe vriendelijker. Flash dat het niet gelukt is en redirecten naar producterbij, ... liefst met behoud van wat er al was ingevuld...
+    
+    
+    console.log(ding.titel + " opgeslagen.");
+    req.flash('erbij', 'Product toegevoegd!');
+    res.redirect('/geheim');
   });
 });
 
-router.get('/beveiliging', isLoggedIn, function(req, res, next) {
-  res.render('user/beveiliging');
-});
-
-// router.get('/producten/:category', isLoggedIn, function(req, res, next) {
-//   var category = req.params.category
-//   Product.find({ category: category })
-//   res.render('user/' + category);
-// });
-
-router.get('/zonwering', isLoggedIn, function(req, res, next) {
-  res.render('user/zonwering');
-});
-
-router.get('/gereedschappen', isLoggedIn, function(req, res, next) { 
-  res.render('user/gereedschappen');
-});
-
-router.get('/tuinartikelen', isLoggedIn, function(req, res, next) {
-  res.render('user/tuinartikelen');
-});
-
-router.get('/sierbeslag', isLoggedIn, function(req, res, next) { 
-  res.render('user/sierbeslag');
-});
 
 
 

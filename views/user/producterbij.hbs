@@ -1,0 +1,39 @@
+<h1>Toevoegen product</h1>
+
+
+<form action="/user/producterbij" method="post" id="product-form">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="categorie">Welke categorie? IJzerwaren? Tuinartikelen?</label>
+                <input type="text" id="categorie" class="form-control" name="categorie">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="plaatje">url plaatje</label>
+                <input type="text" id="plaatje" class="form-control" name="plaatje">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="titel">Wat is het? Spaanplaatschroef? Sierspijker? Ketting? Slot? Hark? Driepotige lapjeskater?</label>
+                <input type="text" id="titel" class="form-control" name="titel">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="prijs">Prijs in centen(!)</label>
+                <input type="number" id="prijs" class="form-control" name="prijs">
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="productDetails">productDetails: alles (ALLES) wat relevant is voor de koper en nu nog niet ergens anders staat. Maat, kleur, materiaal, aantal per doosje/eenheid, wat het precies is of andere nadere uitleg, you name it</label>
+                <input type="text" id="productDetails" class="form-control" name="productDetails">
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <button type="submit" class="btn btn-success">Opslaan</button>
+</form>
