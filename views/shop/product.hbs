@@ -1,0 +1,15 @@
+<h2>{{ product.titel }}</h2>
+
+<img src="{{ product.imagePath }}" alt="{{ product.titel }}" class="img-responsive">
+
+<p>{{ product.productDetails }}</p>
+
+    <div class="clearfix">
+        <div class="price pull-left">{{ product.prijs }}</div>
+        <a href="/add-to-cart/{{product._id}}" class="btn btn-success pull-right" role="button">Gooi in winkelwagen</a>
+        {{!-- {{#if login}} --}}
+        <a href="/user/producteraf/{{this._id}}" class="btn btn-success pull-right" role="button">Verwijder dit product</a>
+        {{!-- {{/if}} --}}
+
+        <p>Categorie: {{ product.categorie }}</p>
+    </div>

@@ -7,7 +7,7 @@ var csrf = require('csurf');
 var passport = require('passport');
 var Order = require('../models/order');
 var Cart = require('../models/cart');
-var IJzerwaar = require('../models/ijzerwaar');
+var Product = require('../models/product');
 var mongoose = require('mongoose');   // maar dit is dan de niet-de-bedoeling-seedermethode?
 mongoose.connect('mongodb://localhost:27017/shopping',  { useNewUrlParser: true });   // seedermethode?
 
@@ -30,21 +30,28 @@ router.get('/profile', isLoggedIn, function(req, res, next) {     // isLoggedIn 
 });
 
 router.get('/producterbij', isLoggedIn, function(req, res, next) { 
-  res.render('user/ijzerwaren', {csrfToken: req.csrfToken()});
+  res.render('user/producterbij', {csrfToken: req.csrfToken()});
 });
 
 router.post('/producterbij', function(req, res, next) {
+  var cat = req.body.categorie;
+  cat = cat.toLowerCase();
+
+  var prs = req.body.prijs / 100;
+
   var product = new Product({
-    categorie: req.body.categorie,
+    categorie: cat,    // omzetten in kleine letters als dat nog niet zo is
     imagePath: req.body.plaatje,
     titel: req.body.titel,
-    prijs: req.body.prijs,        // komt in centen! > iets mee doen in view. Of hier? kan dat
+    prijs: prs,        // komt in centen! > iets mee doen in view. Of hier? kan dat
     productDetails: req.body.productDetails
   });
   
   product.save(function (err, ding) {
-    if (err) return console.error(err);         // dit moet effe vriendelijker. Flash dat het niet gelukt is en redirecten naar producterbij, ... liefst met behoud van wat er al was ingevuld...
-    
+    if (err) {
+      //flashfailure?
+      return res.redirect('/user/producterbij');
+    }
     
     console.log(ding.titel + " opgeslagen.");
     req.flash('erbij', 'Product toegevoegd!');
@@ -52,9 +59,32 @@ router.post('/producterbij', function(req, res, next) {
   });
 });
 
+router.get('/producteraf/:id', isLoggedIn, function(req, res, next) {
+  var productId = req.params.id;
+  console.log(productId);
+  Product.findById(productId, function(err, product) {
+    if (err) {
+      //flash iets
+      return res.redirect('/');
+    }
+
+    //product.remove(); // hoe moet dit
+    console.log(`item ${productId} is nu verwijderd. zodra ik gevonden heb hoe LOL`);
+    //flash iets positiefs
+    res.redirect('/producten');
+  });
+});
 
 
+router.get('/categorieerbij', isLoggedIn, function(req, res, next) { 
+  res.render('user/categorieerbij', {csrfToken: req.csrfToken()});
+});
 
+router.post('/categorieerbij', function(req, res, next) {
+  var nieuweCategorie = req.body.categorie;
+  var markup = '<li class="nav-item"><a class="nav-link" href="/producten/{{nieuweCategorie}}"><h4>{{nieuweCategorie}}</h4></a></li>';
+  //document.getElementById('sidebar-categorylist').insertAdjacentHTML('beforeend', markup);    // okee dat werkt dus niet zo
+});
 
 router.get('/logout', isLoggedIn, function(req, res, next) { 
   req.logout();

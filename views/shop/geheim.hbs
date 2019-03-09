@@ -1,22 +1,29 @@
-<h1>inlogpagina</h1>
+<h1>Beheerpagina</h1>
 
-      {{!-- {{# if login}} --}}
-          <a href="/user/profile">Gebruikersprofiel</a>
-          <a href="/user/logout">Uitloggen</a>
-      {{!-- {{ else }} --}}
-          <a href="/user/signin">Inloggen</a>
-          <a href="/user/signup">Account aanmaken</a>
-      {{!-- {{/if}} --}}
+{{!-- {{# if login}} --}}
+    <a href="/user/profile">Gebruikersprofiel</a>
+    <a href="/user/logout">Uitloggen</a>
+{{!-- {{ else }} --}}
+    <a href="/user/signin">Inloggen</a>
+    <a href="/user/signup">Account aanmaken</a>
+{{!-- {{/if}} --}}
 
-<h2>Nieuw product toevoegen</h2>
-    <div class="btn-group">
-        <button class="btn btn-primary btn-xs dropdown-toggle" type="button" data-toggle="dropdown">Kies categorie <span class="caret"></span></button>
-        <ul class="dropdown-menu">
-            <li><a href="/user/beveiliging">Beveiliging</a></li>
-            <li><a href="/user/zonwering">Zonwering</a></li>
-            <li><a href="/user/gereedschappen">Gereedschappen</a></li>
-            <li><a href="/user/ijzerwaren">IJzerwaren</a></li>
-            <li><a href="/user/tuinartikelen">Tuinartikelen</a></li>
-            <li><a href="/user/sierbeslag">Sierbeslag</a></li>
-        </ul>
-    </div>
+
+<a href="/user/categorieerbij" ><h2>Nieuwe categorie toevoegen</h2></a>
+
+<a href="/user/producterbij" ><h2>Nieuw product toevoegen</h2></a>
+
+
+
+
+{{!-- <div class="btn-group">
+    <button class="btn btn-primary btn-xs dropdown-toggle" type="button" data-toggle="dropdown">Kies categorie <span class="caret"></span></button>
+    <ul class="dropdown-menu">
+        <li><a href="/user/beveiliging">Beveiliging</a></li>
+        <li><a href="/user/zonwering">Zonwering</a></li>
+        <li><a href="/user/gereedschappen">Gereedschappen</a></li>
+        <li><a href="/user/ijzerwaren">IJzerwaren</a></li>
+        <li><a href="/user/tuinartikelen">Tuinartikelen</a></li>
+        <li><a href="/user/sierbeslag">Sierbeslag</a></li>
+    </ul>
+</div> --}}

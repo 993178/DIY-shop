@@ -6,7 +6,7 @@ var schema = new Schema({                       // de bouwtekeningen die defini√
     imagePath: {type: String, required: true},
     titel: {type: String, required: true},
     prijs: {type: Number, required: true},
-    productDetails: [{ key: String, value: String }]
+    productDetails: { type: String, required: false }       // we doen nog maar even 1 veld
 });
 
 module.exports = mongoose.model('Product', schema); // we exporteren een model 'Product' dat gebaseerd is op dat schema

@@ -1,0 +1,13 @@
+<h2>Categorie toevoegen</h2>
+<form action="/user/categorieerbij" method="post" id="categorie-form">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label for="categorie">Nieuwe categorie</label>
+                <input type="text" id="categorie" class="form-control" name="categorie">
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <button type="submit" class="btn btn-success">Opslaan</button>
+</form>

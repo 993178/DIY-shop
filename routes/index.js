@@ -24,9 +24,29 @@ router.get('/producten', function(req, res, next) {
 
 router.get('/producten/:categorie', function(req, res, next) {
   var categorie = req.params.categorie
-  Product.find({ categorie: categorie })
-  res.render('/' + categorie);        // producten.hbs hergebruiken?
-})
+
+  Product.find({ categorie }, function(error, catProducts) {
+    console.log(catProducts);
+    var productChunks = [];
+    var chunkSize = 3;
+    for (var i = 0; i < catProducts.length; i+= chunkSize) {
+      productChunks.push(catProducts.slice(i, i + chunkSize));
+    }
+    res.render('shop/producten', { products: productChunks});
+  });
+});
+
+router.get('/:id', function(req, res, next) {
+  var productId = req.params.id;
+  Product.findById(productId, function(err, product) {
+    if (err) {
+      //flash iets
+      return res.redirect('/producten');
+    }
+    res.render('shop/product', {product});
+  });
+});
+
 
 
 router.get('/add-to-cart/:id', function(req, res, next) {   // Discount Jonas: next kun je altijd weglaten als je die niet gebruikt, hij zet hem neer want conventie
@@ -188,27 +208,45 @@ functie ijzerwaren omgebouwd tot producterbij
 model product aangepast, model ijzerwaren verwijderd
 flashboodschap toevoegen bij product toegevoegd
 Zorgen dat klanten niet ingelogd hoeven te zijn om een bestelling te plaatsen
-
-
-Gepoogd: 
-Doen: 
-
-Checken of producterbijformulier werkt (en flashboodschap ook!)
-checken of renderen categorieën werkt (links ook van fugly sidebar die geen sidebar wil zijn)
-checken wat er gebeurt als product toevoegen niet goed gaat > is dan alle data weer weg? > zo ja, opslaan in sessie ofzo? lokale cookies?
-
-verbeteren errorhandling producterbijfunctie
-
+/geheim aanpassen aan 1 formulier etc voor product erbij en voor categorie erbij
 
 Productcategorieën renderen via een [automatische] query, dus dat je niet specifiek /ijzerwaren hebt, maar 
   /producten?=ijzerwaren of zoiets. Render die dingen als products in producten.hbs
 Links in sidebar daarop aansluiten
 producten.hbs gebruiken als view ook voor categorieën
-
-Netjes de prijs in euro's weergeven en niet in centen...
+Checken of producterbijformulier werkt > jep, extra producten worden ook gerenderd op Alle producten
+renderen categorieën werkt (links ook van fugly sidebar die geen sidebar wil zijn), mits categorie met kleine letter is ingevoerd
 
 router.get maken met query voor 1 specifiek product (zie ook addItem!)
 Algemene view maken voor 1 product, met alle velden inclusief het grote detailsveld
+knop toevoegen aan productthumbnails (liever: hele thumbnail als knop gebruiken) om naar productview te gaan
+
+
+
+Gepoogd: 
+
+functie schrijven voor dynamisch toevoegen categorieën in de sidebar...
+  > ik probeerde document.insertAdjacentHTML(etc).
+  > Computer: "wtf is 'document'"
+  > internet: "ExpressJS is server side en kan die client side DOM-elementen niet lezen, het moet via req.params"
+  > maar ik zie dat alleen werken als je iets wilt toevoegen op een bestaande locatie in de hbs, zoals {{variabele}} 
+    of {{{markup}}}, niet als je juist dat stukje wilt toevoegen
+
+categorieën renderen met :categorie, maar hoe benoem
+
+Doen: 
+
+...er is iets idioots aan de gang waarbij test opeens naar /producten leidt... ??!! wtf
+
+uitzoeken hoe die flashboodschappen precies werken en die overal toevoegen aan de errorhandling (producterbij oa)
+
+checken wat er gebeurt als product toevoegen niet goed gaat > is dan alle data weer weg? > zo ja, opslaan in sessie ofzo? lokale cookies?
+
+zorgen dat ie de categorieën ook verwerkt als ze met een hoofdletter worden ingetypt (kun je zo'n getRidOfCapitals-methode loslaten binnen een Model?)
+
+
+Netjes de prijs in euro's weergeven en niet in centen... > moet in opslagfunctie denk?
+
 
 product verwijderen uit database (mongoose, mongo)
 mogelijkheid toevoegen dat ene product te verwijderen uit database ALS GEBRUIKER IS INGELOGD
