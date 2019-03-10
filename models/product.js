@@ -3,9 +3,10 @@ var Schema = mongoose.Schema;
 
 var schema = new Schema({                       // de bouwtekeningen die definiëren hoe de data eruit moet zien
     categorie: { type: String, required: true },
-    imagePath: {type: String, required: true},
+    imagePath: {type: String, required: false},
     titel: {type: String, required: true},
     prijs: {type: Number, required: true},
+    prijsOud: {type: Number, required: false},
     productDetails: { type: String, required: false }       // we doen nog maar even 1 veld
 });
 

@@ -35,21 +35,29 @@ router.get('/producterbij', isLoggedIn, function(req, res, next) {
 
 router.post('/producterbij', function(req, res, next) {
   var cat = req.body.categorie;
-  cat = cat.toLowerCase();
+  cat = cat.toLowerCase();      // geen verschil tussen tuinartikelen, Tuinartikelen en tUInarTiKElen. Gelijke tuinartikelen, gelijke kappen.
 
-  var prs = req.body.prijs / 100;
+  var prs = parseFloat(req.body.prijs) / 100;
+  console.log(prs);
+  var prsOud = parseFloat(req.body.prijsOud) / 100;
+  console.log(prsOud);
+
 
   var product = new Product({
-    categorie: cat,    // omzetten in kleine letters als dat nog niet zo is
+    categorie: cat,
     imagePath: req.body.plaatje,
     titel: req.body.titel,
-    prijs: prs,        // komt in centen! > iets mee doen in view. Of hier? kan dat
+    prijs: prs,
+    prijsOud: prsOud,
     productDetails: req.body.productDetails
   });
-  
+
+  console.log(product);
+
   product.save(function (err, ding) {
     if (err) {
       //flashfailure?
+      console.log('hier gaat iets mis');
       return res.redirect('/user/producterbij');
     }
     
@@ -60,21 +68,18 @@ router.post('/producterbij', function(req, res, next) {
 });
 
 router.get('/producteraf/:id', isLoggedIn, function(req, res, next) {
-  var productId = req.params.id;
-  console.log(productId);
-  Product.findById(productId, function(err, product) {
-    if (err) {
-      //flash iets
-      return res.redirect('/');
-    }
+  console.log('we gaan iets verwijderen...');
 
-    //product.remove(); // hoe moet dit
-    console.log(`item ${productId} is nu verwijderd. zodra ik gevonden heb hoe LOL`);
-    //flash iets positiefs
-    res.redirect('/producten');
+  Product.findOneAndDelete({ _id: req.params.id }, function(err) {
+    if (err) {
+        console.log('het is niet gelukt');      // flash..!
+        res.redirect('/:id');
+    } else {
+        console.log('jaaa, weg met die shit moehahahaha');    // ook flash
+        res.redirect('/producten');
+    }
   });
 });
-
 
 router.get('/categorieerbij', isLoggedIn, function(req, res, next) { 
   res.render('user/categorieerbij', {csrfToken: req.csrfToken()});

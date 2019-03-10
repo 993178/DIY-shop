@@ -2,15 +2,15 @@
     <div class="row">
 
         {{# each this }}
-        {{!-- this is een hbs-keywoord dat verwijst naar het huidige element (hier dus de kortere trioarray) binnen de array die de buitenste each aan het behandelen is. Als ik het goed begrijp tenminste --}}
+        {{!-- this is een hbs-keyword dat verwijst naar het huidige element (hier dus de kortere trioarray) binnen de array die de buitenste each aan het behandelen is. Als ik het goed begrijp tenminste --}}
             <div class="col-sm-6 col-md-4">
                 <div class="thumbnail">
                 <img src="{{ this.imagePath }}" alt="{{ this.titel }}" class="img-responsive">
                 <div class="caption">
                     <h3>{{ this.titel }}</h3>
-                    {{!-- <p class="description">{{ this.description }}</p> --}}
                     <div class="clearfix">
-                        <div class="price pull-left">{{ this.prijs }}</div>
+                        <h3>Afgeprijsd van €{{ this.prijsOud }} nu voor</h3>
+                        <div class="price pull-left">€{{ this.prijs }}</div>
                         <a href="/add-to-cart/{{this._id}}" class="btn btn-success pull-right" role="button">Gooi in winkelwagen</a>
                         <a href="/{{this._id}}" class="btn btn-success pull-right" role="button">Lees meer</a>
                     </div>

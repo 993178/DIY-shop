@@ -23,10 +23,10 @@ router.get('/producten', function(req, res, next) {
 });
 
 router.get('/producten/:categorie', function(req, res, next) {
+  // req.session.oldUrl = req.url;
   var categorie = req.params.categorie
 
   Product.find({ categorie }, function(error, catProducts) {
-    console.log(catProducts);
     var productChunks = [];
     var chunkSize = 3;
     for (var i = 0; i < catProducts.length; i+= chunkSize) {
@@ -36,19 +36,7 @@ router.get('/producten/:categorie', function(req, res, next) {
   });
 });
 
-router.get('/:id', function(req, res, next) {
-  var productId = req.params.id;
-  Product.findById(productId, function(err, product) {
-    if (err) {
-      //flash iets
-      return res.redirect('/producten');
-    }
-    res.render('shop/product', {product});
-  });
-});
-
-
-
+// SHOPPING CART
 router.get('/add-to-cart/:id', function(req, res, next) {   // Discount Jonas: next kun je altijd weglaten als je die niet gebruikt, hij zet hem neer want conventie
   var productId = req.params.id;
   var cart = new Cart(req.session.cart ? req.session.cart : { items: {}});  // nieuw karretje maken en daar oud karretje ingooien als argument - ALS die bestaat, anders een leeg object. Je kunt hier ook een mal van maken: {items: {}, totalQty: 0, totalPrice: 0} ipv de pipe operators in cart.js die Discount Jonas prefereert
@@ -58,7 +46,16 @@ router.get('/add-to-cart/:id', function(req, res, next) {   // Discount Jonas: n
     }
     cart.add(product, product.id);
     req.session.cart = cart;    // wordt ook automatisch opgeslagen
-    res.redirect('/');          // dus als het goed gaat, wordt je óók teruggestuurd naar de homepage...!! Lekker gebruikersvriendelijk
+
+    // if (req.session.oldUrl) {
+    //   console.log('er is een oldUrl, joechei');       
+    //   var oldUrl = res.session.oldUrl;
+    //   res.session.oldUrl = null;
+    //   res.redirect(oldUrl);
+    // } else {
+    //   console.log('er is geen oldUrl, waar heb je het over wtf');
+      res.redirect('/producten');
+    // }
   });
 });
 
@@ -97,6 +94,7 @@ router.get('/shopping-cart', function(req, res, next) {
   res.render('shop/shopping-cart', {products: cart.generateArray(), totalPrice: cart.totalPrice});
 });
 
+// CHECKOUT
 router.get('/checkout', function(req, res, next) {    // komt vanaf shopping-cart.hbs
   if (!req.session.cart) {
     return res.redirect('/shopping-cart');
@@ -142,24 +140,40 @@ router.post('/checkout', function(req, res, next) {   // isLoggedIn > dat je dus
   });
 });
 
+router.get('/dokken', function(req, res, next) {
+  res.render('shop/dokken');
+});
+
+
+// BEHEER
 router.get('/geheim', function(req, res, next) {
   // var producterbij = req.flash('erbij')[0];    // even checken waar 'erbij' dan vandaan moet komen, of hoe, van producterbij
   res.render('shop/geheim');
-})
+});
 
-router.get('/dokken', function(req, res, next) {
-  res.render('shop/dokken');
-})
+router.get('/:id', function(req, res, next) {
+  // req.session.oldUrl = req.url;
+  var productId = req.params.id;
+  Product.findById(productId, function(err, product) {
+    // if (err) {
+    //   //flash iets
+    //   return res.redirect('/');
+    // }
+    res.render('shop/product', {product});
+  });
+});
+
 
 module.exports = router;
 
-// function isLoggedIn(req, res, next) {     // als je niet bent ingelogd ga je maar lekker naar - niet meer de homepage maar de sign in page
+function isLoggedIn(req, res, next) {     // als je niet bent ingelogd ga je maar lekker naar - niet meer de homepage maar de sign in page
+  console.log('ja hoor, we zijn ingelogd');
 //   if (req.isAuthenticated()) {
 //       return next();
 //   }
 //   req.session.oldUrl = req.url;     // dus we slaan op als OldUrl in de sessie, waar we eerst waren (/checkout)
 //   res.redirect('/user/signin');
-// };
+};
 
 // wordt die oldUrl nou nog ergens hier gebruikt??  > nee, in user.js
 
@@ -193,8 +207,8 @@ Zo'n algemene productdetails is wel het handigst als ze dingen ook op Marktplaat
 
 Gedaan: 
 
-nieuwe github repository aanmaken   klonen in aparte map voor het daadwerkelijke project      alles uit huidige map erin flikkeren    checken of alles het nog doet, ook mongo enzo    denk het wel     signupfunctie verwijderen (althans uitgecomment - ze moeten nog wel zélf een beheerdersaccount aanmaken...!!)   links naar sign up, sign in, gebruikerspagina en uitloggen verwijderen van homepagina   checkout niet meer terugsturen naar signin als klant niet ingelogd is   in winkelwagentje mogelijkheid toevoegen meer te kopen van een product    in checkout formulier toevoegen voor naam en adres enzo   adresgegevens toevoegen in Order.js   op beheerpaginaview 'product toevoegen' neergezet en een dropdown toegevoegd voor het kiezen van een categorie product om toe te voegen...    checkout houden als plek om adresgegevens in te vullen, maar iDeal op aparte volgende pagina doen (is vooral belangrijk als we de verzendkosten weten te regelen)   view en router.get maken voor nieuwe beheerderspagina (...waarvan de /naam geheim moet blijven... dus dan moet ik hem niet op github zetten... voorlopig maar /geheim)    op /geheim uitlogfunctie ook weer voorwaardelijk tonen    inlog- en uitlogfunctie en profiel verplaatsen van navbar naar /geheim   > ja, maar link werkt niet   kijken wat er nou mis is met die links, want ik kan vanaf /geheim niet meer op profiel en andere pagina's komen en da's niet handig   checken of alles nog steeds werkt als ik de beveiliging weer aan zet (dummyversie isLoggedIn)  > ja, met next(); erin   view met formulier + model + postmethode gemaakt voor ijzerwaren    info uit formulier plukken en opslaan in variabele lukt   views en getmethodes gemaakt, zonder formulier nog, voor overige categorieën (beveiliging, zonwering, gereedschappen, tuinartikelen, sierbeslag)    iets in mongo database zetten via formulier: Functie om ijzerwaar toe te voegen aan mongo database   Laden duurt lang, functie lijkt te lopen,  geslaagd-console.log binnen function(error, result)  loopt ook, maar daarna geeft browser de boodschap dat het mislukt  is en dat localhost niets heeft verzonden  Csrf gaf een error, onzichtbaar token toegevoegd onder formulier, weet niet of dat wel de bedoeling is bij toevoegen producten??! Kan het iets zijn met de connectie met mongo?? > R: Je moet altijd of een response renderen of een redirect geven. Anders denkt de browser dat je het verzoek nog aan het verwerken bent. Wanneer dit te lang duurt, denkt de browser, jaa daaaag! Daar kan ik niet op wachten.. (request timeout) > geredirect naar /geheim
-bestellingsformulier > adres met aparte straat, huisnummer, toevoeging, plaatsnaam en postcode, mailadres of telefoonnummer
+//nieuwe github repository aanmaken   klonen in aparte map voor het daadwerkelijke project      alles uit huidige map erin flikkeren    checken of alles het nog doet, ook mongo enzo    denk het wel     signupfunctie verwijderen (althans uitgecomment - ze moeten nog wel zélf een beheerdersaccount aanmaken...!!)   links naar sign up, sign in, gebruikerspagina en uitloggen verwijderen van homepagina   checkout niet meer terugsturen naar signin als klant niet ingelogd is   in winkelwagentje mogelijkheid toevoegen meer te kopen van een product    in checkout formulier toevoegen voor naam en adres enzo   adresgegevens toevoegen in Order.js   op beheerpaginaview 'product toevoegen' neergezet en een dropdown toegevoegd voor het kiezen van een categorie product om toe te voegen...    checkout houden als plek om adresgegevens in te vullen, maar iDeal op aparte volgende pagina doen (is vooral belangrijk als we de verzendkosten weten te regelen)   view en router.get maken voor nieuwe beheerderspagina (...waarvan de /naam geheim moet blijven... dus dan moet ik hem niet op github zetten... voorlopig maar /geheim)    op /geheim uitlogfunctie ook weer voorwaardelijk tonen    inlog- en uitlogfunctie en profiel verplaatsen van navbar naar /geheim   > ja, maar link werkt niet   kijken wat er nou mis is met die links, want ik kan vanaf /geheim niet meer op profiel en andere pagina's komen en da's niet handig   checken of alles nog steeds werkt als ik de beveiliging weer aan zet (dummyversie isLoggedIn)  > ja, met next(); erin   view met formulier + model + postmethode gemaakt voor ijzerwaren    info uit formulier plukken en opslaan in variabele lukt   views en getmethodes gemaakt, zonder formulier nog, voor overige categorieën (beveiliging, zonwering, gereedschappen, tuinartikelen, sierbeslag)    iets in mongo database zetten via formulier: Functie om ijzerwaar toe te voegen aan mongo database   Laden duurt lang, functie lijkt te lopen,  geslaagd-console.log binnen function(error, result)  loopt ook, maar daarna geeft browser de boodschap dat het mislukt  is en dat localhost niets heeft verzonden  Csrf gaf een error, onzichtbaar token toegevoegd onder formulier, weet niet of dat wel de bedoeling is bij toevoegen producten??! Kan het iets zijn met de connectie met mongo?? > R: Je moet altijd of een response renderen of een redirect geven. Anders denkt de browser dat je het verzoek nog aan het verwerken bent. Wanneer dit te lang duurt, denkt de browser, jaa daaaag! Daar kan ik niet op wachten.. (request timeout) > geredirect naar /geheim
+//bestellingsformulier > adres met aparte straat, huisnummer, toevoeging, plaatsnaam en postcode, mailadres of telefoonnummer
 
 homepage productvrij gemaakt (maar die behoudt nog wel flashboodschappen)
 producten verplaatst naar /producten
@@ -210,8 +224,7 @@ flashboodschap toevoegen bij product toegevoegd
 Zorgen dat klanten niet ingelogd hoeven te zijn om een bestelling te plaatsen
 /geheim aanpassen aan 1 formulier etc voor product erbij en voor categorie erbij
 
-Productcategorieën renderen via een [automatische] query, dus dat je niet specifiek /ijzerwaren hebt, maar 
-  /producten?=ijzerwaren of zoiets. Render die dingen als products in producten.hbs
+Productcategorieën renderen via een [automatische] query met :categorie. Render die dingen als products in producten.hbs
 Links in sidebar daarop aansluiten
 producten.hbs gebruiken als view ook voor categorieën
 Checken of producterbijformulier werkt > jep, extra producten worden ook gerenderd op Alle producten
@@ -221,7 +234,16 @@ router.get maken met query voor 1 specifiek product (zie ook addItem!)
 Algemene view maken voor 1 product, met alle velden inclusief het grote detailsveld
 knop toevoegen aan productthumbnails (liever: hele thumbnail als knop gebruiken) om naar productview te gaan
 
+zorgen dat ie de categorieën ook verwerkt als ze met een hoofdletter worden ingetypt (kun je zo'n getRidOfCapitals-methode loslaten binnen een Model?)
+Netjes de prijs in euro's weergeven en niet in centen... > moet in opslagfunctie denk?
 
+Links naar /geheim en /shoppingcart deden raar (onterecht redirecten, user/product renderen) > router.get('/:id' etc)  onderaan op pagina gezet :-)
+
+productverwijderknop alleen beschikbaar voor beheerder > als ik alles weer inschakel zou het net zo goed moeten werken als alle andere csrf-shit
+product verwijderen uit database
+
+veld voor oude prijs toegevoegd aan producterbij.hbs, product.hbs, producten.hbs, productmodel en functie /producterbij
+beide prijzen weer in nummers veranderd
 
 Gepoogd: 
 
@@ -232,28 +254,29 @@ functie schrijven voor dynamisch toevoegen categorieën in de sidebar...
   > maar ik zie dat alleen werken als je iets wilt toevoegen op een bestaande locatie in de hbs, zoals {{variabele}} 
     of {{{markup}}}, niet als je juist dat stukje wilt toevoegen
 
-categorieën renderen met :categorie, maar hoe benoem
+product verwijderen uit database (mongoose, mongo)
+  > krijg een 404, als ik naar console kijk, lijkt ie te zoeken naar een GET maar het is een DELETE 
+    intussen (al deed ie het daarvoor ook al niet)
+
+> zet gewoon een dummymethode in index.js en user.js die '/producteraf/:id' heet met verschillende coslogs erin en 
+pruts tot je beet hebt
+
+> zoek uit hoe die removemethode eruit moet zien in mongoose
+
 
 Doen: 
 
-...er is iets idioots aan de gang waarbij test opeens naar /producten leidt... ??!! wtf
+dat oldUrl-trucje ook toepassen bij /add-to-cart, want als je iets in je karretje gooit, wil je niet van je pagina gegooid worden
+
 
 uitzoeken hoe die flashboodschappen precies werken en die overal toevoegen aan de errorhandling (producterbij oa)
 
-checken wat er gebeurt als product toevoegen niet goed gaat > is dan alle data weer weg? > zo ja, opslaan in sessie ofzo? lokale cookies?
 
-zorgen dat ie de categorieën ook verwerkt als ze met een hoofdletter worden ingetypt (kun je zo'n getRidOfCapitals-methode loslaten binnen een Model?)
-
-
-Netjes de prijs in euro's weergeven en niet in centen... > moet in opslagfunctie denk?
-
-
-product verwijderen uit database (mongoose, mongo)
-mogelijkheid toevoegen dat ene product te verwijderen uit database ALS GEBRUIKER IS INGELOGD
-
+checken wat er gebeurt als product toevoegen niet goed gaat > is dan alle data weer weg?
+   > ja > opslaan in sessie ofzo? lokale cookies?
 idealiter: mogelijkheid product te klonen en/of aan te passen
 
-
+Terugknop toevoegen bij :id-pagina, met prevUrl
 
 User veranderen in beheerder oid, of in geheim
 
@@ -300,6 +323,8 @@ met u op over de precieze afhandeling van de bestelling (wanneer afhalen / hoeve
 producten renderen met flexbox ipv die idiote productChunks want kom op zeg
 
 netjes de producten naast de sidebar renderen ipv eronder...
+
+netjes de prijzen in euro's met komma's weergeven
 
 verzinnen hoe website eruit moet zien - voortbouwen op bestaand ontwerpje of ... ?
 bootstrap eruitwerken, onderbrengen in eigen css-bestand

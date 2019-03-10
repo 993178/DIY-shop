@@ -5,10 +5,11 @@
 <p>{{ product.productDetails }}</p>
 
     <div class="clearfix">
-        <div class="price pull-left">{{ product.prijs }}</div>
+        <h3>Afgeprijsd van €{{ product.prijsOud }} nu voor</h3>
+        <div class="price pull-left">€{{ product.prijs }}</div>
         <a href="/add-to-cart/{{product._id}}" class="btn btn-success pull-right" role="button">Gooi in winkelwagen</a>
         {{!-- {{#if login}} --}}
-        <a href="/user/producteraf/{{this._id}}" class="btn btn-success pull-right" role="button">Verwijder dit product</a>
+        <a href="/user/producteraf/{{product._id}}" class="btn btn-success pull-right" role="button">Verwijder dit product</a>
         {{!-- {{/if}} --}}
 
         <p>Categorie: {{ product.categorie }}</p>
