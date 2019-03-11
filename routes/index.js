@@ -6,7 +6,6 @@ var Order = require('../models/order');
 
 // GET home page
 router.get('/', function(req, res, next) {
-  console.log('now what......???!!'); 
   var successMsg = req.flash('success')[0]; // als er net iets is gekocht, willen we de boodschap hier weergeven; de eerste en enige successboodschap die flash standaard in een array stopt
   res.render('shop/index', { title: 'Coen Doen Doe-het-zelf Outlet', successMsg: successMsg, noMessage: !successMsg });  // renderfunctie met te renderen dingen, aangevuld met de products die hier docs heten. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
 });
@@ -95,13 +94,15 @@ router.get('/shopping-cart', function(req, res, next) {
   res.render('shop/shopping-cart', {products: cart.generateArray(), totalPrice: cart.totalPrice});
 });
 
+
+
 // CHECKOUT
 router.get('/checkout', function(req, res, next) {    // komt vanaf shopping-cart.hbs
   if (!req.session.cart) {
     return res.redirect('/shopping-cart');
   }
   var cart = new Cart(req.session.cart);
-  var errMsg = req.flash('error')[0];   // eerste (want enige) element in error-array die flash maakt hieronder in regel 69
+  var errMsg = req.flash('error')[0];   // eerste (want enige) element in error-array die flash maakt hieronder in regel 126
   res.render('shop/checkout', {total: cart.totalPrice, errMsg: errMsg, noError: !errMsg});    // we geven errMsg door en checken in noError of ie falsy is, zo ja, dan is noError truthy en geeft checkout.hbs het error-element niet weer...
 });
 
@@ -146,13 +147,14 @@ router.get('/dokken', function(req, res, next) {
 });
 
 
+
 // BEHEER
 router.get('/geheim', function(req, res, next) {
-  // var producterbij = req.flash('erbij')[0];    // even checken waar 'erbij' dan vandaan moet komen, of hoe, van producterbij
-  res.render('shop/geheim');
+  var gelukt = req.flash('erbij')[0];
+  res.render('shop/geheim', { gelukt: gelukt, noDice: !gelukt });
 });
 
-router.get('/:id', function(req, res, next) {
+router.get('/:id', function(req, res, next) {   // moet onderaan want meest algemene link
   // req.session.oldUrl = req.url;
   var productId = req.params.id;
   Product.findById(productId, function(err, product) {
@@ -236,8 +238,8 @@ router.get maken met query voor 1 specifiek product (zie ook addItem!)
 Algemene view maken voor 1 product, met alle velden inclusief het grote detailsveld
 knop toevoegen aan productthumbnails (liever: hele thumbnail als knop gebruiken) om naar productview te gaan
 
-zorgen dat ie de categorieën ook verwerkt als ze met een hoofdletter worden ingetypt (kun je zo'n getRidOfCapitals-methode loslaten binnen een Model?)
-Netjes de prijs in euro's weergeven en niet in centen... > moet in opslagfunctie denk?
+zorgen dat ie de categorieën ook verwerkt als ze met een hoofdletter worden ingetypt
+Netjes de prijs in euro's weergeven en niet in centen...
 
 Links naar /geheim en /shoppingcart deden raar (onterecht redirecten, user/product renderen) > router.get('/:id' etc)  onderaan op pagina gezet :-)
 
@@ -250,15 +252,40 @@ beide prijzen (weer) in nummers veranderd (raar, want dat waren toch ook nummers
 Winkelwagentje totaalprijs fixen, kennelijk gebeurt daar iets raars  > shoppingcart had nog price ipv prijs :-)
 
 
-
 Erachter gekomen wat er gebeurt als ik per ongeluk de terminator sluit terwijl de server nog loopt
+Erachter gekomen hoe ik de server van de gesloten terminator permanent kill zodat ik weer console.logs kan lezen ggggffff$%^&#$%%
+    > het lijkt goed te gaan als ik het proces kill en dan npm start gebruik, maar dan moet ik steeds stoppen en starten
+    > nodemon gebruiken via npm run dev werkt niet meer, dan zegt ie dat Port 3000 al in gebruik is 
+    > computer herstarten lijkt te helpen
+Erachter gekomen dat herstarten computer en npm run dev foutmelding UnhandledPromiseRejection oid oplevert, mbt mongoverbinding
+    > mongo stoppen en starten helpt
+.
 
 
 Gepoogd: 
 
-Erachter komen hoe ik de server van de gesloten terminator permanent kill zodat ik weer console.logs kan lezen ggggffff$%^&#$%%
-    > het lijkt goed te gaan als ik het proces kill en dan npm start gebruik, maar dan moet ik steeds stoppen en starten
-    > nodemon gebruiken via npm run dev werkt niet meer, dan zegt ie dat Port 3000 al in gebruik is 
+uitzoeken hoe die flashboodschappen precies werken en die overal toevoegen aan de errorhandling (producterbij oa)
+    flash versturen (in POST):
+      req.flash('error', err.message);      // naam flashboodschaparray, de boodschap zelf
+    flash ontvangen (in GET):
+      var errMsg = req.flash('error')[0];   // naam array, eerste item
+    flash renderen (in GET):
+      res.render('shop/checkout', {total: cart.totalPrice, errMsg: errMsg, noError: !errMsg});
+    of:
+      res.render('user/signup', {csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0});
+    flash renderen (in de hbs):
+      <div class="alert alert-danger {{#if noError}}hidden{{/if}}" id="charge-error" >
+        {{errMsg}}
+      </div>
+    of (danger voor errors en success voor positieve meldingen):
+      {{#if hasErrors}}
+        <div class="alert alert-danger">
+          {{#each messages }}
+          <p>{{this}}</p>
+          {{/each}}
+        </div>
+      {{/if}}
+.
 
 functie schrijven voor dynamisch toevoegen categorieën in de sidebar...
   > ik probeerde document.insertAdjacentHTML(etc).
@@ -270,12 +297,14 @@ functie schrijven voor dynamisch toevoegen categorieën in de sidebar...
 
 dat oldUrl-trucje ook toepassen bij /add-to-cart, want als je iets in je karretje gooit, wil je niet van je pagina gegooid worden
   > lukte niet, can't read property oldUrl of undefined..., redirect ook door naar /add-to-cart/<vorige pagina>... Zucht.
+.
+
+
+
 
 Doen: 
 
-
-uitzoeken hoe die flashboodschappen precies werken en die overal toevoegen aan de errorhandling (producterbij oa)
-
+categorieën alvast hardcoden in de sidebar, met voorwaardelijk tonen oid. Aan- en uitzetten in /geheim?
 
 checken wat er gebeurt als product toevoegen niet goed gaat > is dan alle data weer weg?
    > ja > opslaan in sessie ofzo? lokale cookies?
@@ -367,4 +396,6 @@ Then simply kill it/them:
 
 $ kill -9 40466
 $ kill -9 40467
+
+Fuck dat - gewoon de computer helemaal uitzetten en herstarten is het enige wat echt helpt. Daarna mongo ook herstarten.
 */

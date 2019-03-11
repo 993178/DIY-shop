@@ -41,7 +41,7 @@
     <div class="col-sm-6 col-md-4 col-md-offset-4 col-sm-offset-3">
         <h1>Afrekenen</h1>
         <h4>Totaalbedrag: €{{ total }}</h4>
-        <div class="alert alert-danger hidden" id="charge-error" >
+        <div class="alert alert-danger {{#if noError}}hidden{{/if}}" id="charge-error" >
             {{errMsg}}
         </div>
         {{!-- rondom de class hidden stond nog {{#if noError}} en {{/if}} --}}

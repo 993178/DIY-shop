@@ -1,4 +1,8 @@
 <h1>Beheerpagina</h1>
+  <div class="alert alert-success {{#if noDice}}hidden{{/if}}" id="erbij-success" >
+    {{errMsg}}
+  </div>
+
 
 {{!-- {{# if login}} --}}
     <a href="/user/profile">Gebruikersprofiel</a>

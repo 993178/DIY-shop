@@ -81,15 +81,17 @@ router.get('/producteraf/:id', isLoggedIn, function(req, res, next) {
   });
 });
 
-router.get('/categorieerbij', isLoggedIn, function(req, res, next) { 
-  res.render('user/categorieerbij', {csrfToken: req.csrfToken()});
-});
 
-router.post('/categorieerbij', function(req, res, next) {
-  var nieuweCategorie = req.body.categorie;
-  var markup = '<li class="nav-item"><a class="nav-link" href="/producten/{{nieuweCategorie}}"><h4>{{nieuweCategorie}}</h4></a></li>';
-  //document.getElementById('sidebar-categorylist').insertAdjacentHTML('beforeend', markup);    // okee dat werkt dus niet zo
-});
+// > veranderen in functie om bestaande categorieën wel/niet weer te geven (radiobuttons?)
+// router.get('/categorieerbij', isLoggedIn, function(req, res, next) { 
+//   res.render('user/categorieerbij', {csrfToken: req.csrfToken()});
+// });
+
+// router.post('/categorieerbij', function(req, res, next) {
+//   var nieuweCategorie = req.body.categorie;
+//   var markup = '<li class="nav-item"><a class="nav-link" href="/producten/{{nieuweCategorie}}"><h4>{{nieuweCategorie}}</h4></a></li>';
+//   //document.getElementById('sidebar-categorylist').insertAdjacentHTML('beforeend', markup);    // okee dat werkt dus niet zo
+// });
 
 router.get('/logout', isLoggedIn, function(req, res, next) { 
   req.logout();
