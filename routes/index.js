@@ -6,6 +6,7 @@ var Order = require('../models/order');
 
 // GET home page
 router.get('/', function(req, res, next) {
+  console.log('now what......???!!'); 
   var successMsg = req.flash('success')[0]; // als er net iets is gekocht, willen we de boodschap hier weergeven; de eerste en enige successboodschap die flash standaard in een array stopt
   res.render('shop/index', { title: 'Coen Doen Doe-het-zelf Outlet', successMsg: successMsg, noMessage: !successMsg });  // renderfunctie met te renderen dingen, aangevuld met de products die hier docs heten. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
 });
@@ -197,6 +198,7 @@ Gemene delers:
 -naam product (bijv Spaanplaatschroeven)
 -categorie (bijv IJzerwaren)
 -prijs
+-oude prijs (afgeprijsd van ... !)
 -productdetails (met verder ALLES wat er nog aan onderscheidende dingen te zeggen valt over het product)
 
 Zo'n algemene productdetails is wel het handigst als ze dingen ook op Marktplaats hebben staan - de beschrijving is er dan al, kunnen ze die kopiëren
@@ -243,9 +245,20 @@ productverwijderknop alleen beschikbaar voor beheerder > als ik alles weer insch
 product verwijderen uit database
 
 veld voor oude prijs toegevoegd aan producterbij.hbs, product.hbs, producten.hbs, productmodel en functie /producterbij
-beide prijzen weer in nummers veranderd
+beide prijzen (weer) in nummers veranderd (raar, want dat waren toch ook nummers??)
+
+Winkelwagentje totaalprijs fixen, kennelijk gebeurt daar iets raars  > shoppingcart had nog price ipv prijs :-)
+
+
+
+Erachter gekomen wat er gebeurt als ik per ongeluk de terminator sluit terwijl de server nog loopt
+
 
 Gepoogd: 
+
+Erachter komen hoe ik de server van de gesloten terminator permanent kill zodat ik weer console.logs kan lezen ggggffff$%^&#$%%
+    > het lijkt goed te gaan als ik het proces kill en dan npm start gebruik, maar dan moet ik steeds stoppen en starten
+    > nodemon gebruiken via npm run dev werkt niet meer, dan zegt ie dat Port 3000 al in gebruik is 
 
 functie schrijven voor dynamisch toevoegen categorieën in de sidebar...
   > ik probeerde document.insertAdjacentHTML(etc).
@@ -253,20 +266,12 @@ functie schrijven voor dynamisch toevoegen categorieën in de sidebar...
   > internet: "ExpressJS is server side en kan die client side DOM-elementen niet lezen, het moet via req.params"
   > maar ik zie dat alleen werken als je iets wilt toevoegen op een bestaande locatie in de hbs, zoals {{variabele}} 
     of {{{markup}}}, niet als je juist dat stukje wilt toevoegen
-
-product verwijderen uit database (mongoose, mongo)
-  > krijg een 404, als ik naar console kijk, lijkt ie te zoeken naar een GET maar het is een DELETE 
-    intussen (al deed ie het daarvoor ook al niet)
-
-> zet gewoon een dummymethode in index.js en user.js die '/producteraf/:id' heet met verschillende coslogs erin en 
-pruts tot je beet hebt
-
-> zoek uit hoe die removemethode eruit moet zien in mongoose
-
-
-Doen: 
+  > Inmiddels een lijstje met categorieën doorgemaild gekregen van mijn oom en tante, dus ik kan ze er gewoon in hardcoden
 
 dat oldUrl-trucje ook toepassen bij /add-to-cart, want als je iets in je karretje gooit, wil je niet van je pagina gegooid worden
+  > lukte niet, can't read property oldUrl of undefined..., redirect ook door naar /add-to-cart/<vorige pagina>... Zucht.
+
+Doen: 
 
 
 uitzoeken hoe die flashboodschappen precies werken en die overal toevoegen aan de errorhandling (producterbij oa)
@@ -276,22 +281,21 @@ checken wat er gebeurt als product toevoegen niet goed gaat > is dan alle data w
    > ja > opslaan in sessie ofzo? lokale cookies?
 idealiter: mogelijkheid product te klonen en/of aan te passen
 
-Terugknop toevoegen bij :id-pagina, met prevUrl
-
 User veranderen in beheerder oid, of in geheim
 
+Regelen hoe dat werkt met zo'n order, die moet te zien zijn voor zowel de klant als voor de verkoper
 
 checken of alles nog steeds werkt als ik echt de beveiliging weer aan zet (echte versie isLoggedIn met isAuthenticated)
 
-al die test-shit uit de database verwijderen... (dus ook inloggegevens enzo)
 idealiter moeten R&C ergens eenmalig hun account kunnen aanmaken
-
+eventuele testinloggegevens verwijderen
 
 
 
 //BESTELLINGEN
 
-Nadenken over hoe afhandelen bestelling moet verlopen... 
+Nadenken over hoe afhandelen bestelling moet verlopen... > weten Coen en Ria ook nog niet zo goed. Marktplaatsafhandeling 
+  via mail vinden ze ook al best
 
 Voor verkoper: e-mail met bestelling, adres en mailadres/telefoonnummer klant is waarschijnlijk het handigste
     > automatisch e-mail sturen met daarin die informatie
@@ -344,5 +348,23 @@ Kleuren Coendoen:
 
  #feab00 #fb0 orange hsl(40,100,49) rgb(254,171,0)
 
+.
 
+
+
+
+
+De volgende keer dat ik per ongeluk de terminal sluit terwijl de server nog loopt: 
+
+ If there's any other process locking the port, you can find out which PID it has like this:
+
+$ lsof -i :3000
+COMMAND     PID USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+Passenger 40466 josh    5u  IPv4 0x7cae9332073ed4df      0t0  TCP *:hbci (LISTEN)
+Passenger 40467 josh    5u  IPv4 0x7cae9332073ed4df      0t0  TCP *:hbci (LISTEN)
+
+Then simply kill it/them:
+
+$ kill -9 40466
+$ kill -9 40467
 */
