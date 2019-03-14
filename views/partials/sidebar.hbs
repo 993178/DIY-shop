@@ -1,20 +1,14 @@
 <navbar>
     <div>
         <a class="nav-item nav-link" href="/producten"><h3>Alle producten</h3></a>
+
         <ul id="sidebar-categorylist" class="nav flex-column">
+        {{# each categories }}
             <li class="nav-item">
-                <a class="nav-link" href="/producten/tuinartikelen"><h4>Tuinartikelen</h4></a>
+                <a class="nav-link" href="/producten/{{.}}"><h4>{{.}}</h4></a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/producten/dremel"><h4>Dremeltoebehoren</h4></a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="/producten/ijzerwaren"><h4>IJzerwaren</h4></a>
-            </li>
-
+        {{/each}}
         </ul>
-
     </div>
 </navbar>
 

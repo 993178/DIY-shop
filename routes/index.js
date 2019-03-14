@@ -3,11 +3,20 @@ var router = express.Router();
 var Product = require('../models/product');   // productmodel binnenhalen (het schema, niet dat seedergedoe)   
 var Cart = require('../models/cart');
 var Order = require('../models/order');
+var categories
+
+function updateCategoriesForSideBar(){
+  Product.find().distinct('categorie', function(err, cats) {
+    categories = cats
+  });
+}
+
+updateCategoriesForSideBar()
 
 // GET home page
 router.get('/', function(req, res, next) {
   var successMsg = req.flash('success')[0]; // als er net iets is gekocht, willen we de boodschap hier weergeven; de eerste en enige successboodschap die flash standaard in een array stopt
-  res.render('shop/index', { title: 'Coen Doen Doe-het-zelf Outlet', successMsg: successMsg, noMessage: !successMsg });  // renderfunctie met te renderen dingen, aangevuld met de products die hier docs heten. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
+  res.render('shop/index', { title: 'Coen Doen Doe-het-zelf Outlet', successMsg: successMsg, noMessage: !successMsg, categories: categories });  // renderfunctie met te renderen dingen, aangevuld met de products die hier docs heten. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
 });
 
 
@@ -18,12 +27,12 @@ router.get('/producten', function(req, res, next) {
     for (var i = 0; i < docs.length; i+= chunkSize) {   // met iedere loop gaan we 3 omhoog: eerst 0, dan 3, dan 6 etc
       productChunks.push(docs.slice(i, i + chunkSize)); // in iedere loop snijden we een brok van 3 stuks uit de docs-array, beginnend bij i, eindigend vóór i + 3, en pushen dat brok in de productChunks-array
     }
-    res.render('shop/producten', { title: 'Shopping cart', products: productChunks});  // renderfunctie met te renderen dingen, products is de term in de view, die hier wordt gelijkgesteld met die chunks. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
+    res.render('shop/producten', { title: 'Shopping cart', products: productChunks, categories: categories});  // renderfunctie met te renderen dingen, products is de term in de view, die hier wordt gelijkgesteld met die chunks. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
   });
 });
 
 router.get('/producten/:categorie', function(req, res, next) {
-  // req.session.oldUrl = req.url;
+  req.session.oldUrl = req.url;
   var categorie = req.params.categorie
 
   Product.find({ categorie }, function(error, catProducts) {
@@ -47,15 +56,15 @@ router.get('/add-to-cart/:id', function(req, res, next) {   // Discount Jonas: n
     cart.add(product, product.id);
     req.session.cart = cart;    // wordt ook automatisch opgeslagen
 
-    // if (req.session.oldUrl) {
-    //   console.log('er is een oldUrl, joechei');       
-    //   var oldUrl = res.session.oldUrl;
-    //   res.session.oldUrl = null;
-    //   res.redirect(oldUrl);
-    // } else {
-    //   console.log('er is geen oldUrl, waar heb je het over wtf');
+    if (req.session.oldUrl) {
+      console.log('er is een oldUrl, joechei');       
+      var oldUrl = req.session.oldUrl;
+      req.session.oldUrl = null;
+      res.redirect(oldUrl);
+    } else {
+      console.log('er is geen oldUrl, waar heb je het over wtf');
       res.redirect('/producten');
-    // }
+    }
   });
 });
 
@@ -211,106 +220,35 @@ Zo'n algemene productdetails is wel het handigst als ze dingen ook op Marktplaat
 
 Gedaan: 
 
-//nieuwe github repository aanmaken   klonen in aparte map voor het daadwerkelijke project      alles uit huidige map erin flikkeren    checken of alles het nog doet, ook mongo enzo    denk het wel     signupfunctie verwijderen (althans uitgecomment - ze moeten nog wel zélf een beheerdersaccount aanmaken...!!)   links naar sign up, sign in, gebruikerspagina en uitloggen verwijderen van homepagina   checkout niet meer terugsturen naar signin als klant niet ingelogd is   in winkelwagentje mogelijkheid toevoegen meer te kopen van een product    in checkout formulier toevoegen voor naam en adres enzo   adresgegevens toevoegen in Order.js   op beheerpaginaview 'product toevoegen' neergezet en een dropdown toegevoegd voor het kiezen van een categorie product om toe te voegen...    checkout houden als plek om adresgegevens in te vullen, maar iDeal op aparte volgende pagina doen (is vooral belangrijk als we de verzendkosten weten te regelen)   view en router.get maken voor nieuwe beheerderspagina (...waarvan de /naam geheim moet blijven... dus dan moet ik hem niet op github zetten... voorlopig maar /geheim)    op /geheim uitlogfunctie ook weer voorwaardelijk tonen    inlog- en uitlogfunctie en profiel verplaatsen van navbar naar /geheim   > ja, maar link werkt niet   kijken wat er nou mis is met die links, want ik kan vanaf /geheim niet meer op profiel en andere pagina's komen en da's niet handig   checken of alles nog steeds werkt als ik de beveiliging weer aan zet (dummyversie isLoggedIn)  > ja, met next(); erin   view met formulier + model + postmethode gemaakt voor ijzerwaren    info uit formulier plukken en opslaan in variabele lukt   views en getmethodes gemaakt, zonder formulier nog, voor overige categorieën (beveiliging, zonwering, gereedschappen, tuinartikelen, sierbeslag)    iets in mongo database zetten via formulier: Functie om ijzerwaar toe te voegen aan mongo database   Laden duurt lang, functie lijkt te lopen,  geslaagd-console.log binnen function(error, result)  loopt ook, maar daarna geeft browser de boodschap dat het mislukt  is en dat localhost niets heeft verzonden  Csrf gaf een error, onzichtbaar token toegevoegd onder formulier, weet niet of dat wel de bedoeling is bij toevoegen producten??! Kan het iets zijn met de connectie met mongo?? > R: Je moet altijd of een response renderen of een redirect geven. Anders denkt de browser dat je het verzoek nog aan het verwerken bent. Wanneer dit te lang duurt, denkt de browser, jaa daaaag! Daar kan ik niet op wachten.. (request timeout) > geredirect naar /geheim
-//bestellingsformulier > adres met aparte straat, huisnummer, toevoeging, plaatsnaam en postcode, mailadres of telefoonnummer
-
-homepage productvrij gemaakt (maar die behoudt nog wel flashboodschappen)
-producten verplaatst naar /producten
-view gemaakt voor /producten en relevant gedeelte uit indexview daarheen verplaatst
-bootstrap zoekfunctiehtml teruggepleurd in de navbar
-sidebar in mekaar geflanst met link naar /producten en ul met li's naar de categorieën Tuinartikelen, Voor de Dremel en (moet voorwaardelijk worden) IJzerwaren
-sidebar geïncluded in layout.hbs. Fokking lelijk maar hij wordt weergegeven
-Producten allemaal binnen Product houden, met een categorie daarbinnen voor ijzerwaren etc, en algemene velden voor alle producten, en misschien specifiekere info allemaal in één specificatiesveld?
-Formulier IJzerwaren ombouwen tot algemeen formulier met die velden plus productDetails-veld
-functie ijzerwaren omgebouwd tot producterbij
-model product aangepast, model ijzerwaren verwijderd
-flashboodschap toevoegen bij product toegevoegd
-Zorgen dat klanten niet ingelogd hoeven te zijn om een bestelling te plaatsen
-/geheim aanpassen aan 1 formulier etc voor product erbij en voor categorie erbij
-
-Productcategorieën renderen via een [automatische] query met :categorie. Render die dingen als products in producten.hbs
-Links in sidebar daarop aansluiten
-producten.hbs gebruiken als view ook voor categorieën
-Checken of producterbijformulier werkt > jep, extra producten worden ook gerenderd op Alle producten
-renderen categorieën werkt (links ook van fugly sidebar die geen sidebar wil zijn), mits categorie met kleine letter is ingevoerd
-
-router.get maken met query voor 1 specifiek product (zie ook addItem!)
-Algemene view maken voor 1 product, met alle velden inclusief het grote detailsveld
-knop toevoegen aan productthumbnails (liever: hele thumbnail als knop gebruiken) om naar productview te gaan
-
-zorgen dat ie de categorieën ook verwerkt als ze met een hoofdletter worden ingetypt
-Netjes de prijs in euro's weergeven en niet in centen...
-
-Links naar /geheim en /shoppingcart deden raar (onterecht redirecten, user/product renderen) > router.get('/:id' etc)  onderaan op pagina gezet :-)
-
-productverwijderknop alleen beschikbaar voor beheerder > als ik alles weer inschakel zou het net zo goed moeten werken als alle andere csrf-shit
-product verwijderen uit database
-
-veld voor oude prijs toegevoegd aan producterbij.hbs, product.hbs, producten.hbs, productmodel en functie /producterbij
-beide prijzen (weer) in nummers veranderd (raar, want dat waren toch ook nummers??)
-
-Winkelwagentje totaalprijs fixen, kennelijk gebeurt daar iets raars  > shoppingcart had nog price ipv prijs :-)
-
-
-Erachter gekomen wat er gebeurt als ik per ongeluk de terminator sluit terwijl de server nog loopt
-Erachter gekomen hoe ik de server van de gesloten terminator permanent kill zodat ik weer console.logs kan lezen ggggffff$%^&#$%%
-    > het lijkt goed te gaan als ik het proces kill en dan npm start gebruik, maar dan moet ik steeds stoppen en starten
-    > nodemon gebruiken via npm run dev werkt niet meer, dan zegt ie dat Port 3000 al in gebruik is 
-    > computer herstarten lijkt te helpen
-Erachter gekomen dat herstarten computer en npm run dev foutmelding UnhandledPromiseRejection oid oplevert, mbt mongoverbinding
-    > mongo stoppen en starten helpt
-.
-
+//nieuwe github repository aanmaken   klonen in aparte map voor het daadwerkelijke project      alles uit huidige map erin flikkeren    checken of alles het nog doet, ook mongo enzo    denk het wel     signupfunctie verwijderen (althans uitgecomment - ze moeten nog wel zélf een beheerdersaccount aanmaken...!!)   links naar sign up, sign in, gebruikerspagina en uitloggen verwijderen van homepagina   checkout niet meer terugsturen naar signin als klant niet ingelogd is   in winkelwagentje mogelijkheid toevoegen meer te kopen van een product    in checkout formulier toevoegen voor naam en adres enzo   adresgegevens toevoegen in Order.js   op beheerpaginaview 'product toevoegen' neergezet en een dropdown toegevoegd voor het kiezen van een categorie product om toe te voegen...    checkout houden als plek om adresgegevens in te vullen, maar iDeal op aparte volgende pagina doen (is vooral belangrijk als we de verzendkosten weten te regelen)   view en router.get maken voor nieuwe beheerderspagina (...waarvan de /naam geheim moet blijven... dus dan moet ik hem niet op github zetten... voorlopig maar /geheim)    op /geheim uitlogfunctie ook weer voorwaardelijk tonen    inlog- en uitlogfunctie en profiel verplaatsen van navbar naar /geheim   > ja, maar link werkt niet   kijken wat er nou mis is met die links, want ik kan vanaf /geheim niet meer op profiel en andere pagina's komen en da's niet handig   checken of alles nog steeds werkt als ik de beveiliging weer aan zet (dummyversie isLoggedIn)  > ja, met next(); erin   view met formulier + model + postmethode gemaakt voor ijzerwaren    info uit formulier plukken en opslaan in variabele lukt   views en getmethodes gemaakt, zonder formulier nog, voor overige categorieën (beveiliging, zonwering, gereedschappen, tuinartikelen, sierbeslag)    iets in mongo database zetten via formulier: Functie om ijzerwaar toe te voegen aan mongo database   Laden duurt lang, functie lijkt te lopen,  geslaagd-console.log binnen function(error, result)  loopt ook, maar daarna geeft browser de boodschap dat het mislukt  is en dat localhost niets heeft verzonden  Csrf gaf een error, onzichtbaar token toegevoegd onder formulier, weet niet of dat wel de bedoeling is bij toevoegen producten??! Kan het iets zijn met de connectie met mongo?? > R: Je moet altijd of een response renderen of een redirect geven. Anders denkt de browser dat je het verzoek nog aan het verwerken bent. Wanneer dit te lang duurt, denkt de browser, jaa daaaag! Daar kan ik niet op wachten.. (request timeout) > geredirect naar /geheim   bestellingsformulier > adres met aparte straat, huisnummer, toevoeging, plaatsnaam en postcode, mailadres of telefoonnummer
+//homepage productvrij gemaakt (maar die behoudt nog wel flashboodschappen) producten verplaatst naar /producten  view gemaakt voor /producten en relevant gedeelte uit indexview daarheen verplaatst bootstrap zoekfunctiehtml teruggepleurd in de navbar  sidebar in mekaar geflanst met link naar /producten en ul met li's naar de categorieën Tuinartikelen, Voor de Dremel en (moet voorwaardelijk worden) IJzerwaren sidebar geïncluded in layout.hbs. Fokking lelijk maar hij wordt weergegeven Producten allemaal binnen Product houden, met een categorie daarbinnen voor ijzerwaren etc, en algemene velden voor alle producten, en misschien specifiekere info allemaal in één specificatiesveld? Formulier IJzerwaren ombouwen tot algemeen formulier met die velden plus productDetails-veld  functie ijzerwaren omgebouwd tot producterbij model product aangepast, model ijzerwaren verwijderd  flashboodschap toevoegen bij product toegevoegd Zorgen dat klanten niet ingelogd hoeven te zijn om een bestelling te plaatsen /geheim aanpassen aan 1 formulier etc voor product erbij en voor categorie erbij    Productcategorieën renderen via een [automatische] query met :categorie. Render die dingen als products in producten.hbs  Links in sidebar daarop aansluiten  producten.hbs gebruiken als view ook voor categorieën Checken of producterbijformulier werkt > jep, extra producten worden ook gerenderd op Alle producten  renderen categorieën werkt (links ook van fugly sidebar die geen sidebar wil zijn), mits categorie met kleine letter is ingevoerd   router.get maken met query voor 1 specifiek product (zie ook addItem!)  Algemene view maken voor 1 product, met alle velden inclusief het grote detailsveld knop toevoegen aan productthumbnails om naar productview te gaan    zorgen dat ie de categorieën ook verwerkt als ze met een hoofdletter worden ingetypt  Netjes de prijs in euro's weergeven en niet in centen...    Links naar /geheim en /shoppingcart deden raar (onterecht redirecten, user/product renderen) > router.get('/:id' etc)  onderaan op pagina gezet :-)   productverwijderknop alleen beschikbaar voor beheerder > als ik alles weer inschakel zou het net zo goed moeten werken als alle andere csrf-shit  product verwijderen uit database    veld voor oude prijs toegevoegd aan producterbij.hbs, product.hbs, producten.hbs, productmodel en functie /producterbij beide prijzen (weer) in nummers veranderd (raar, want dat waren toch ook nummers??)   Winkelwagentje totaalprijs fixen, kennelijk gebeurt daar iets raars  > shoppingcart had nog price ipv prijs :-)   Erachter gekomen wat er gebeurt als ik per ongeluk de terminator sluit terwijl de server nog loopt  Erachter gekomen hoe ik de server van de gesloten terminator permanent kill zodat ik weer console.logs kan lezen ggggffff$%^&#$%%     > het lijkt goed te gaan als ik het proces kill en dan npm start gebruik, maar dan moet ik steeds stoppen en starten      > nodemon gebruiken via npm run dev werkt niet meer, dan zegt ie dat Port 3000 al in gebruik is       > computer herstarten lijkt te helpen Erachter gekomen dat herstarten computer en npm run dev foutmelding UnhandledPromiseRejection oid oplevert, mbt mongoverbinding     > mongo stoppen en starten helpt  .       uitzoeken hoe die flashboodschappen precies werken en die overal toevoegen aan de errorhandling (producterbij oa)     flash versturen (in POST):        req.flash('error', err.message);      // naam flashboodschaparray, de boodschap zelf      flash ontvangen (in GET):       var errMsg = req.flash('error')[0];   // naam array, eerste item      flash renderen (in GET):        res.render('shop/checkout', {total: cart.totalPrice, errMsg: errMsg, noError: !errMsg});      of:       res.render('user/signup', {csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0});      flash renderen (in de hbs):       <div class="alert alert-danger {{#if noError}}hidden{{/if}}" id="charge-error" >          {{errMsg}}        </div>      of (danger voor errors en success voor positieve meldingen):        {{#if hasErrors}}         <div class="alert alert-danger">            {{#each messages }}           <p>{{this}}</p>           {{/each}}         </div>        {{/if}} .   functie schrijven voor dynamisch toevoegen categorieën in de sidebar...   > ik probeerde document.insertAdjacentHTML(etc).    > Computer: "wtf is 'document'"   > internet: "ExpressJS is server side en kan die client side DOM-elementen niet lezen, het moet via req.params"   > maar ik zie dat alleen werken als je iets wilt toevoegen op een bestaande locatie in de hbs, zoals {{variabele}}      of {{{markup}}}, niet als je juist dat stukje wilt toevoegen    > Inmiddels een lijstje met categorieën doorgemaild gekregen van mijn oom en tante, dus ik kan ze er gewoon in hardcoden  .   dat oldUrl-trucje ook toepassen bij /add-to-cart, want als je iets in je karretje gooit, wil je niet van je pagina gegooid worden   > lukte niet, can't read property oldUrl of undefined..., redirect ook door naar /add-to-cart/<vorige pagina>... Zucht. .     
 
 Gepoogd: 
-
-uitzoeken hoe die flashboodschappen precies werken en die overal toevoegen aan de errorhandling (producterbij oa)
-    flash versturen (in POST):
-      req.flash('error', err.message);      // naam flashboodschaparray, de boodschap zelf
-    flash ontvangen (in GET):
-      var errMsg = req.flash('error')[0];   // naam array, eerste item
-    flash renderen (in GET):
-      res.render('shop/checkout', {total: cart.totalPrice, errMsg: errMsg, noError: !errMsg});
-    of:
-      res.render('user/signup', {csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0});
-    flash renderen (in de hbs):
-      <div class="alert alert-danger {{#if noError}}hidden{{/if}}" id="charge-error" >
-        {{errMsg}}
-      </div>
-    of (danger voor errors en success voor positieve meldingen):
-      {{#if hasErrors}}
-        <div class="alert alert-danger">
-          {{#each messages }}
-          <p>{{this}}</p>
-          {{/each}}
-        </div>
-      {{/if}}
-.
-
-functie schrijven voor dynamisch toevoegen categorieën in de sidebar...
-  > ik probeerde document.insertAdjacentHTML(etc).
-  > Computer: "wtf is 'document'"
-  > internet: "ExpressJS is server side en kan die client side DOM-elementen niet lezen, het moet via req.params"
-  > maar ik zie dat alleen werken als je iets wilt toevoegen op een bestaande locatie in de hbs, zoals {{variabele}} 
-    of {{{markup}}}, niet als je juist dat stukje wilt toevoegen
-  > Inmiddels een lijstje met categorieën doorgemaild gekregen van mijn oom en tante, dus ik kan ze er gewoon in hardcoden
-
-dat oldUrl-trucje ook toepassen bij /add-to-cart, want als je iets in je karretje gooit, wil je niet van je pagina gegooid worden
-  > lukte niet, can't read property oldUrl of undefined..., redirect ook door naar /add-to-cart/<vorige pagina>... Zucht.
-.
-
-
 
 
 Doen: 
 
-categorieën alvast hardcoden in de sidebar, met voorwaardelijk tonen oid. Aan- en uitzetten in /geheim?
+/geheim moet puur het inlogscherm worden... of eigenlijk, signin moet de standaard /geheim worden en de rest moet daar
+aan hangen. 
+User veranderen in beheerder oid, of in geheim
+
+  shop, met alle dingen voor de klant
+  /geheim, met inlogscherm (en signup in eerste instantie), en uitloglink (die mag wel op navbar? alleen zichtbaar wanneer ingelogd?)
+  /geheim/etc, met alle andere dingen (producterbij). Waarbij 'geheim' uiteindelijk iets anders niet-raadbaars moet worden
+
+bij product toevoegen zorgen dat je een plaatje uit je eigen computer kunt toevoegen...
+
+categorieën dynamisch renderen in sidebar, op een manier dat je dat in iedere pagina kunt zien...
+  > mustache prestatic?
+  > kan dat niet in app??
+
+in app kon je de flashboodschap op iedere pagina weergeven, dat vind ik ook wel chill
+
+voorstel van mijn moeder: categorieën in een dropdown zetten, met mogelijkheid extra categorie toe te voegen...
 
 checken wat er gebeurt als product toevoegen niet goed gaat > is dan alle data weer weg?
-   > ja > opslaan in sessie ofzo? lokale cookies?
+   > ja > opslaan in local storage
 idealiter: mogelijkheid product te klonen en/of aan te passen
-
-User veranderen in beheerder oid, of in geheim
 
 Regelen hoe dat werkt met zo'n order, die moet te zien zijn voor zowel de klant als voor de verkoper
 
@@ -352,6 +290,8 @@ met u op over de precieze afhandeling van de bestelling (wanneer afhalen / hoeve
 
 
 //UITERLIJK en overige functies voor uiteindelijke website
+
+hele kaartje in productoverzicht veranderen in knop voor product zelf
 
 producten renderen met flexbox ipv die idiote productChunks want kom op zeg
 
