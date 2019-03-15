@@ -1,3 +1,33 @@
+<h1>Beheerpagina</h1>
+  <div class="alert alert-success" {{#if noDice}}hidden{{/if}} id="erbij-success" >
+    {{gelukt}}
+  </div>
+
+
+{{!-- {{# if login}} --}}
+    <a href="/geheim/logout">Uitloggen</a>
+{{!-- {{ else }} --}}
+    <a href="/geheim/signin">Inloggen</a>
+    <a href="/geheim/signup">Account aanmaken</a>
+{{!-- {{/if}} --}}
+
+
+<a href="/geheim/categorieerbij" ><h2>Nieuwe categorie toevoegen</h2></a>
+
+<a href="/geheim/producterbij" ><h2>Nieuw product toevoegen</h2></a>
+
+
+
+{{!-- 
+            <div class="form-group">
+                <label for="categorie">Welke categorie? IJzerwaren? Tuinartikelen? Gebruik GEEN hoofdletter!</label>
+                <input type="text" id="categorie" class="form-control" name="categorie">              
+            </div> --}}
+
+
+
+
+<h1>Bestellingen</h1>
 <div class="row">
     <div class="col-md-8 col-md-offset-2">
         <h1>Gebruikersprofiel</h1>

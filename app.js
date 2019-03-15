@@ -35,7 +35,7 @@ app.use(session({
   resave: false, 
   saveUninitialized: false, 
   store: new MongoStore({ mongooseConnection: mongoose.connection }),
-  cookie: { maxAge: 180 * 60 * 1000 }   // hoe lang sessie mag duren, in min * sec * milliseconden. 3 uur voor een webshop?? IK zou me dood ergeren
+  cookie: { maxAge: 360 * 60 * 1000 }   // hoe lang sessie mag duren, in min * sec * milliseconden. > 6 uur
 })); // DiscountJonas zet die middelste twee op false omdat anders de sessie automatisch op de server wordt opgeslagen, ook als er niks veranderd is. Store is om de mongooseverbinding ook hiervoor te gebruiken en niet apart een tweede verbinding te maken (want dat is stom)
 app.use(flash());   // altijd ná session
 app.use(passport.initialize());
@@ -48,7 +48,7 @@ app.use(function(req, res, next) {            // login status available in all v
   next();
 })
 
-app.use('/user', userRouter);   // eerst de /user afvangen, want dit begint ook met /, net als die hieronder! Specifiek voor algemeen.
+app.use('/geheim', userRouter);   // eerst /geheim afvangen, want dit begint ook met /, net als die hieronder! Specifiek voor algemeen.
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
@@ -66,5 +66,13 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+// dit zou moeten werken, wanneer aangepast, om flashboodschappen overal weer te geven, onafhankelijk van de pagina. 
+// Nou heb ik fashboodschappen met allerlei namen, niet alleen success_messages en error_messages, dus die moeten er dan nog bij
+// app.use(function(req, res, next){
+//   res.locals.success_messages = req.flash('success_messages');
+//   res.locals.error_messages = req.flash('error_messages');
+//   next();
+// });
 
 module.exports = app;

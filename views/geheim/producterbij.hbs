@@ -1,13 +1,19 @@
 <h1>Toevoegen product</h1>
 
 
-<form action="/user/producterbij" method="post" id="product-form">
+<form action="/geheim/producterbij" method="post" id="product-form">
     <div class="row">
         <div class="col-xs-12">
             <div class="form-group">
                 <label for="categorie">Welke categorie? IJzerwaren? Tuinartikelen? Gebruik GEEN hoofdletter!</label>
-                <input type="text" id="categorie" class="form-control" name="categorie">
+                <input type="text" id="categorie" class="form-control" name="categorie">              
             </div>
+            {{!-- <div class="btn-group">
+                <button class="btn btn-primary btn-xs dropdown-toggle" type="button" data-toggle="dropdown">Kies categorie <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li><a href="uhm...">Beveiliging</a></li>
+                </ul>
+            </div> --}}
         </div>
         <div class="col-xs-12">
             <div class="form-group">

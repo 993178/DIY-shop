@@ -8,7 +8,7 @@
                 {{/each}}
             </div>
         {{/if}}
-        <form action="/user/signin" method="post">
+        <form action="/geheim/signin" method="post">
             <div class="form-group">
                 <label for="email">E-mailadres</label>
                 <input type="text" id="email" name="email" class="form-control">
@@ -20,6 +20,6 @@
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             <button type="submit" class="btn btn-primary">Log in</button>
         </form>
-        <p>Nog geen account? <a href="/user/signup">Maak er een aan!</a></p>
+        <p>Nog geen account? <a href="/geheim/signup">Maak er een aan!</a></p>
     </div>
 </div>

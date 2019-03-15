@@ -11,6 +11,8 @@ function updateCategoriesForSideBar(){
   });
 }
 
+// user
+
 updateCategoriesForSideBar()
 
 // GET home page
@@ -184,10 +186,10 @@ function isLoggedIn(req, res, next) {     // als je niet bent ingelogd ga je maa
 //       return next();
 //   }
 //   req.session.oldUrl = req.url;     // dus we slaan op als OldUrl in de sessie, waar we eerst waren (/checkout)
-//   res.redirect('/user/signin');
+//   res.redirect('/geheim/signin');
 };
 
-// wordt die oldUrl nou nog ergens hier gebruikt??  > nee, in user.js
+// wordt die oldUrl nou nog ergens hier gebruikt??  > nee, in geheim.js
 
 
 
@@ -230,10 +232,13 @@ Doen:
 
 /geheim moet puur het inlogscherm worden... of eigenlijk, signin moet de standaard /geheim worden en de rest moet daar
 aan hangen. 
-User veranderen in beheerder oid, of in geheim
+User (voorlopig) veranderen in geheim
+geheim.js > inhoud verplaatsen naar geheim/profile
+
+flash toevoegen bij producteraf
 
   shop, met alle dingen voor de klant
-  /geheim, met inlogscherm (en signup in eerste instantie), en uitloglink (die mag wel op navbar? alleen zichtbaar wanneer ingelogd?)
+  /geheim/index, met inlogscherm (en signup in eerste instantie), en uitloglink (die mag wel op navbar? alleen zichtbaar wanneer ingelogd?)
   /geheim/etc, met alle andere dingen (producterbij). Waarbij 'geheim' uiteindelijk iets anders niet-raadbaars moet worden
 
 bij product toevoegen zorgen dat je een plaatje uit je eigen computer kunt toevoegen...
@@ -245,6 +250,8 @@ categorieën dynamisch renderen in sidebar, op een manier dat je dat in iedere p
 in app kon je de flashboodschap op iedere pagina weergeven, dat vind ik ook wel chill
 
 voorstel van mijn moeder: categorieën in een dropdown zetten, met mogelijkheid extra categorie toe te voegen...
+  > uitzoeken hoe je dan info post, vanuit zo'n li in een dropdown
+  > check bootstrap voor voorbeelden
 
 checken wat er gebeurt als product toevoegen niet goed gaat > is dan alle data weer weg?
    > ja > opslaan in local storage
