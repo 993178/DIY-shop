@@ -1,3 +1,10 @@
+<div class="productweergave">
+
+  <div class="alert alert-success" {{#if noYay}}hidden{{/if}} id="eraf-success" >
+    {{gelukt}}
+  </div>
+
+
 {{# each products }}
     <div class="row">
 
@@ -5,12 +12,12 @@
         {{!-- this is een hbs-keyword dat verwijst naar het huidige element (hier dus de kortere trioarray) binnen de array die de buitenste each aan het behandelen is. Als ik het goed begrijp tenminste --}}
             <div class="col-sm-6 col-md-4">
                 <div class="thumbnail">
-                <img src="{{ this.imagePath }}" alt="{{ this.titel }}" class="img-responsive">
+                <a href="/{{this._id}}"><img src="{{ this.imagePath }}" alt="{{ this.titel }}" class="img-responsive"></a>
                 <div class="caption">
-                    <h3>{{ this.titel }}</h3>
+                    <a href="/{{this._id}}"><h2>{{ this.titel }}</h2></a>
                     <div class="clearfix">
-                        <h3>Afgeprijsd van €{{ this.prijsOud }} nu voor</h3>
-                        <div class="price pull-left">€{{ this.prijs }}</div>
+                        <a href="/{{this._id}}"><h4>Afgeprijsd van €{{ this.prijsOud }} nu voor</h4></a>
+                        <div class="price pull-left"><h1>€{{ this.prijs }}</h1></div>
                         <a href="/add-to-cart/{{this._id}}" class="btn btn-success pull-right" role="button">Gooi in winkelwagen</a>
                         <a href="/{{this._id}}" class="btn btn-success pull-right" role="button">Lees meer</a>
                     </div>
@@ -22,3 +29,5 @@
     </div>
 
 {{/each}}
+
+</div>

@@ -12,7 +12,7 @@ var validator = require('express-validator');
 var MongoStore = require('connect-mongo')(session); // voor het winkelwagentje. Na session importeren, want dat is een argument! Is ipv default 'memoryStore' dat alleen voor development bedoeld is
 
 var indexRouter = require('./routes/index');  // bij Discount Jonas heet dit routes
-var userRouter = require('./routes/user');    // bij Discount Jonas heet dit UserRoutes
+var userRouter = require('./routes/geheim');    // bij Discount Jonas heet dit UserRoutes
 
 
 var app = express();
@@ -46,7 +46,7 @@ app.use(function(req, res, next) {            // login status available in all v
   res.locals.login = req.isAuthenticated();
   res.locals.session = req.session;           // sessie beschikbaar in alle views, zonder hem expliciet te moeten rondporteren via routebestanden
   next();
-})
+});
 
 app.use('/geheim', userRouter);   // eerst /geheim afvangen, want dit begint ook met /, net als die hieronder! Specifiek voor algemeen.
 app.use('/', indexRouter);
@@ -66,13 +66,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-// dit zou moeten werken, wanneer aangepast, om flashboodschappen overal weer te geven, onafhankelijk van de pagina. 
-// Nou heb ik fashboodschappen met allerlei namen, niet alleen success_messages en error_messages, dus die moeten er dan nog bij
-// app.use(function(req, res, next){
-//   res.locals.success_messages = req.flash('success_messages');
-//   res.locals.error_messages = req.flash('error_messages');
-//   next();
-// });
 
 module.exports = app;

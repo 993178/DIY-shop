@@ -17,10 +17,10 @@
         <a class="nav-link" href="/geheim/profile/">test</a>
       </li>
       <li class="nav-item active">
-        <a class="nav-link" href="/geheim/">test login route</a>
+        <a class="nav-link" href="/geheim/index">test login route</a>
       </li>
       <li class="nav-item active">
-        <a class="nav-link" href="/geheim/index">test login route</a>
+        <a class="nav-link" href="/geheim/signup">test signup TIJDELIJK</a>
       </li>
 
       {{#if login}}
@@ -29,8 +29,8 @@
       </li>
       {{/if}}
       <li>
-        <form class="form-inline">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <form action="/producten/:zoekterm" class="form-inline">
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="zoekterm">
           <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Zoeken</button>
         </form>
       </li>

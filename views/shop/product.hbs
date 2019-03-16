@@ -1,16 +1,23 @@
+<div class="productweergave">
+  <div class="alert alert-danger" {{#if noNay}}hidden{{/if}} id="eraf-failure" >
+    {{mislukt}}
+  </div>
+
+
 <h2>{{ product.titel }}</h2>
 
-<img src="{{ product.imagePath }}" alt="{{ product.titel }}" class="img-responsive">
+<img src="{{ product.imagePath }}" alt="{{ product.titel }}" class="img-responsive productplaatje">
 
 <p>{{ product.productDetails }}</p>
 
     <div class="clearfix">
-        <h3>Afgeprijsd van €{{ product.prijsOud }} nu voor</h3>
-        <div class="price pull-left">€{{ product.prijs }}</div>
+        <h4>Afgeprijsd van €{{ product.prijsOud }} nu voor</h4>
+        <div class="price pull-left"><h1>€{{ product.prijs }}</h1></div>
         <a href="/add-to-cart/{{product._id}}" class="btn btn-success pull-right" role="button">Gooi in winkelwagen</a>
         {{!-- {{#if login}} --}}
-        <a href="/user/producteraf/{{product._id}}" class="btn btn-success pull-right" role="button">Verwijder dit product</a>
+        <a href="/geheim/producteraf/{{product._id}}" class="btn btn-success pull-right" role="button">Verwijder dit product</a>
         {{!-- {{/if}} --}}
 
         <p>Categorie: {{ product.categorie }}</p>
     </div>
+</div>    

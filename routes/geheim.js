@@ -17,6 +17,7 @@ router.use(csrfProtection);
 
 router.get('/profile', isLoggedIn, function(req, res, next) {     // isLoggedIn beschermt deze route; je kunt alleen op /profile komen als je bent ingelogd, zie de functie beneden
   Order.find({user: req.user}, function(err, orders) {            // find: the mongoose way of quering the database, en we zoeken orders met dezelfde user als deze ingelogde user in de req (van passport), waarbij mongoose snugger genoeg is om te beseffen dat ie req.user.id moet hebben
+    var gelukt = req.flash('erbij')[0];
     if (err) {
       return res.write('Er schijnen nog geen bestellingen te zijn');    // Discount Jonas schrijft 'Error!', maar dat lijkt me wat voorbarig als je net een account hebt aangemaakt of hebt ingelogd en je profiel wilt bekijken...
     }
@@ -25,44 +26,36 @@ router.get('/profile', isLoggedIn, function(req, res, next) {     // isLoggedIn 
       cart = new Cart(order.cart);    // want cart is ook een van de keys in het Order-object
       order.items = cart.generateArray();   // nieuw veld 'items', met dus de array van items
     });
-    res.render('geheim/profile', { orders: orders });   // render de orders! Wacht - wat als ik de nieuwste order bovenaan wil hebben?
+    res.render('geheim/profile', { orders: orders, gelukt: gelukt, noYay: !gelukt});   // render de orders! Wacht - wat als ik de nieuwste order bovenaan wil hebben?
   });
 });
 
 router.get('/producterbij', isLoggedIn, function(req, res, next) { 
-  res.render('geheim/producterbij', {csrfToken: req.csrfToken()});
+  var mislukt = req.flash('nikserbij')[0];
+  res.render('geheim/producterbij', {csrfToken: req.csrfToken(), mislukt: mislukt, noNay: !mislukt });
 });
 
 router.post('/producterbij', function(req, res, next) {
-  var cat = req.body.categorie;
-  cat = cat.toLowerCase();      // geen verschil tussen tuinartikelen, Tuinartikelen en tUInarTiKElen. Gelijke tuinartikelen, gelijke kappen.
-
   var prs = parseFloat(req.body.prijs) / 100;
-  console.log(prs);
   var prsOud = parseFloat(req.body.prijsOud) / 100;
-  console.log(prsOud);
-
-
   var product = new Product({
-    categorie: cat,
+    categorie: req.body.categorie,
     imagePath: req.body.plaatje,
     titel: req.body.titel,
     prijs: prs,
     prijsOud: prsOud,
     productDetails: req.body.productDetails
   });
-
-  console.log(product);
+  console.log(product.categorie);
 
   product.save(function (err, ding) {
     if (err) {
-      //flashfailure?
-      console.log('hier gaat iets mis');
+      req.flash('nikserbij', 'Product toevoegen mislukt :-(');
       return res.redirect('/geheim/producterbij');
     }
     
     console.log(ding.titel + " opgeslagen.");
-    req.flash('erbij', 'Product toegevoegd!');
+    req.flash('erbij', ding.titel + ' toegevoegd!');
     res.redirect('/geheim/profile');
   });
 });
@@ -70,10 +63,10 @@ router.post('/producterbij', function(req, res, next) {
 router.get('/producteraf/:id', isLoggedIn, function(req, res, next) {
   Product.findOneAndDelete({ _id: req.params.id }, function(err) {
     if (err) {
-        console.log('het is niet gelukt');      // flash..!
-        res.redirect('/:id');
+        req.flash('isernog', 'Product weigert zich te laten verwijderen :-(');
+        res.redirect('producten/:id');
     } else {
-        console.log('jaaa, weg met die shit moehahahaha');    // ook flash
+        req.flash('eraf', 'Product succesvol d\'ruit gekeild');
         res.redirect('/producten');
     }
   });

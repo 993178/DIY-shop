@@ -3,38 +3,39 @@ var router = express.Router();
 var Product = require('../models/product');   // productmodel binnenhalen (het schema, niet dat seedergedoe)   
 var Cart = require('../models/cart');
 var Order = require('../models/order');
-var categories
 
-function updateCategoriesForSideBar(){
+var categorieën;
+
+function updateCategoriesForSideBar(){    // zou dit in app kunnen? Overkoepelend?
   Product.find().distinct('categorie', function(err, cats) {
-    categories = cats
+    categorieën = cats;    
   });
 }
-
-// user
 
 updateCategoriesForSideBar()
 
 // GET home page
 router.get('/', function(req, res, next) {
   var successMsg = req.flash('success')[0]; // als er net iets is gekocht, willen we de boodschap hier weergeven; de eerste en enige successboodschap die flash standaard in een array stopt
-  res.render('shop/index', { title: 'Coen Doen Doe-het-zelf Outlet', successMsg: successMsg, noMessage: !successMsg, categories: categories });  // renderfunctie met te renderen dingen, aangevuld met de products die hier docs heten. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
+  res.render('shop/index', { title: 'Coen Doen Doe-het-zelf Outlet', successMsg: successMsg, noMessage: !successMsg, categories: categorieën });  // renderfunctie met te renderen dingen, aangevuld met de products die hier docs heten. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
 });
 
 
 router.get('/producten', function(req, res, next) {
   Product.find(function(error, docs) {    // Product.find() zoekt alles wat er aan producten te vinden valt, => docs in de callback
+    var gelukt = req.flash('eraf')[0];
     var productChunks = [];   // ivm de rows in index.hbs willen we de producten in trio's opdelen, dus arrays van 3 stuks in deze array
     var chunkSize = 3;
     for (var i = 0; i < docs.length; i+= chunkSize) {   // met iedere loop gaan we 3 omhoog: eerst 0, dan 3, dan 6 etc
       productChunks.push(docs.slice(i, i + chunkSize)); // in iedere loop snijden we een brok van 3 stuks uit de docs-array, beginnend bij i, eindigend vóór i + 3, en pushen dat brok in de productChunks-array
     }
-    res.render('shop/producten', { title: 'Shopping cart', products: productChunks, categories: categories});  // renderfunctie met te renderen dingen, products is de term in de view, die hier wordt gelijkgesteld met die chunks. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
+    res.render('shop/producten', { title: 'Shopping cart', products: productChunks, categories: categorieën, gelukt, noYay: !gelukt});  // renderfunctie met te renderen dingen, products is de term in de view, die hier wordt gelijkgesteld met die chunks. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
   });
 });
 
+
 router.get('/producten/:categorie', function(req, res, next) {
-  req.session.oldUrl = req.url;
+  req.session.oldUrl = req.url;       // zodat je dingen kunt toevoegen aan je wagentje zonder naar een andere pagina geredirect te worden
   var categorie = req.params.categorie
 
   Product.find({ categorie }, function(error, catProducts) {
@@ -43,9 +44,27 @@ router.get('/producten/:categorie', function(req, res, next) {
     for (var i = 0; i < catProducts.length; i+= chunkSize) {
       productChunks.push(catProducts.slice(i, i + chunkSize));
     }
-    res.render('shop/producten', { products: productChunks});
+    res.render('shop/producten', { products: productChunks, noYay: true, categories: categorieën});
   });
 });
+
+// ZOEKFUNCTIE
+router.get('/producten/:zoekterm', function(req, res, next) {
+  console.log('zoeken!');
+  var zoekterm = req.body.zoekterm;
+  console.log('we zoeken ' + zoekterm);
+
+  Product.find({ zoekterm }, function(error, foundProducts) {   // hoe vertel ik hem dat ie overal moet zoeken naar die term?
+    var productChunks = [];
+    var chunkSize = 3;
+    for (var i = 0; i < foundProducts.length; i+= chunkSize) {
+      productChunks.push(foundProducts.slice(i, i + chunkSize));
+    }
+    res.render('shop/producten', { products: productChunks, noYay: true, categories: categorieën});
+  });
+
+});
+
 
 // SHOPPING CART
 router.get('/add-to-cart/:id', function(req, res, next) {   // Discount Jonas: next kun je altijd weglaten als je die niet gebruikt, hij zet hem neer want conventie
@@ -53,18 +72,17 @@ router.get('/add-to-cart/:id', function(req, res, next) {   // Discount Jonas: n
   var cart = new Cart(req.session.cart ? req.session.cart : { items: {}});  // nieuw karretje maken en daar oud karretje ingooien als argument - ALS die bestaat, anders een leeg object. Je kunt hier ook een mal van maken: {items: {}, totalQty: 0, totalPrice: 0} ipv de pipe operators in cart.js die Discount Jonas prefereert
   Product.findById(productId, function(err, product) {
     if (err) {
+
       return res.redirect('/');   // nogal summier - er gaat iets fout en je wordt teruggestuurd naar de homepage...
     }
     cart.add(product, product.id);
     req.session.cart = cart;    // wordt ook automatisch opgeslagen
 
     if (req.session.oldUrl) {
-      console.log('er is een oldUrl, joechei');       
       var oldUrl = req.session.oldUrl;
       req.session.oldUrl = null;
       res.redirect(oldUrl);
     } else {
-      console.log('er is geen oldUrl, waar heb je het over wtf');
       res.redirect('/producten');
     }
   });
@@ -168,12 +186,13 @@ router.get('/geheim', function(req, res, next) {
 router.get('/:id', function(req, res, next) {   // moet onderaan want meest algemene link
   // req.session.oldUrl = req.url;
   var productId = req.params.id;
+  var mislukt = req.flash('isernog')[0];
   Product.findById(productId, function(err, product) {
     // if (err) {
     //   //flash iets
     //   return res.redirect('/');
     // }
-    res.render('shop/product', {product});
+    res.render('shop/product', {product, mislukt: mislukt, noNay: !mislukt, categories: categorieën});
   });
 });
 
@@ -197,72 +216,79 @@ function isLoggedIn(req, res, next) {     // als je niet bent ingelogd ga je maa
 /*
 
 
-Realiteit: Coen en Ria hebben heel veel, erg verschillende producten. Van de verwachte schroefjes en spijkertjes tot stickers
-en ketting en installatiedraad en pluggen en veiligheidssloten en soldeerbouten en toebehoren en van die TV/internetkabels 
-aan toe. 
-Van veel dingen hebben ze maar een paar exemplaren, dus dat is veel om in te voeren.
-Sommige dingen gaan per stuk, andere in kavels voor collegaverkopers, weer andere misschien in (starters?)pakketten.
-
-Denk wel dat het een aanrader is overal de daadwerkelijke foto bij te doen - als je die op de overzichtspagina al ziet, 
-ziet de klant ook al meteen de specificaties op de verpakking
-
-Gemene delers: 
--foto
--naam product (bijv Spaanplaatschroeven)
--categorie (bijv IJzerwaren)
--prijs
--oude prijs (afgeprijsd van ... !)
--productdetails (met verder ALLES wat er nog aan onderscheidende dingen te zeggen valt over het product)
-
-Zo'n algemene productdetails is wel het handigst als ze dingen ook op Marktplaats hebben staan - de beschrijving is er dan al, kunnen ze die kopiëren
-
-
-
-
-
 Gedaan: 
 
 //nieuwe github repository aanmaken   klonen in aparte map voor het daadwerkelijke project      alles uit huidige map erin flikkeren    checken of alles het nog doet, ook mongo enzo    denk het wel     signupfunctie verwijderen (althans uitgecomment - ze moeten nog wel zélf een beheerdersaccount aanmaken...!!)   links naar sign up, sign in, gebruikerspagina en uitloggen verwijderen van homepagina   checkout niet meer terugsturen naar signin als klant niet ingelogd is   in winkelwagentje mogelijkheid toevoegen meer te kopen van een product    in checkout formulier toevoegen voor naam en adres enzo   adresgegevens toevoegen in Order.js   op beheerpaginaview 'product toevoegen' neergezet en een dropdown toegevoegd voor het kiezen van een categorie product om toe te voegen...    checkout houden als plek om adresgegevens in te vullen, maar iDeal op aparte volgende pagina doen (is vooral belangrijk als we de verzendkosten weten te regelen)   view en router.get maken voor nieuwe beheerderspagina (...waarvan de /naam geheim moet blijven... dus dan moet ik hem niet op github zetten... voorlopig maar /geheim)    op /geheim uitlogfunctie ook weer voorwaardelijk tonen    inlog- en uitlogfunctie en profiel verplaatsen van navbar naar /geheim   > ja, maar link werkt niet   kijken wat er nou mis is met die links, want ik kan vanaf /geheim niet meer op profiel en andere pagina's komen en da's niet handig   checken of alles nog steeds werkt als ik de beveiliging weer aan zet (dummyversie isLoggedIn)  > ja, met next(); erin   view met formulier + model + postmethode gemaakt voor ijzerwaren    info uit formulier plukken en opslaan in variabele lukt   views en getmethodes gemaakt, zonder formulier nog, voor overige categorieën (beveiliging, zonwering, gereedschappen, tuinartikelen, sierbeslag)    iets in mongo database zetten via formulier: Functie om ijzerwaar toe te voegen aan mongo database   Laden duurt lang, functie lijkt te lopen,  geslaagd-console.log binnen function(error, result)  loopt ook, maar daarna geeft browser de boodschap dat het mislukt  is en dat localhost niets heeft verzonden  Csrf gaf een error, onzichtbaar token toegevoegd onder formulier, weet niet of dat wel de bedoeling is bij toevoegen producten??! Kan het iets zijn met de connectie met mongo?? > R: Je moet altijd of een response renderen of een redirect geven. Anders denkt de browser dat je het verzoek nog aan het verwerken bent. Wanneer dit te lang duurt, denkt de browser, jaa daaaag! Daar kan ik niet op wachten.. (request timeout) > geredirect naar /geheim   bestellingsformulier > adres met aparte straat, huisnummer, toevoeging, plaatsnaam en postcode, mailadres of telefoonnummer
 //homepage productvrij gemaakt (maar die behoudt nog wel flashboodschappen) producten verplaatst naar /producten  view gemaakt voor /producten en relevant gedeelte uit indexview daarheen verplaatst bootstrap zoekfunctiehtml teruggepleurd in de navbar  sidebar in mekaar geflanst met link naar /producten en ul met li's naar de categorieën Tuinartikelen, Voor de Dremel en (moet voorwaardelijk worden) IJzerwaren sidebar geïncluded in layout.hbs. Fokking lelijk maar hij wordt weergegeven Producten allemaal binnen Product houden, met een categorie daarbinnen voor ijzerwaren etc, en algemene velden voor alle producten, en misschien specifiekere info allemaal in één specificatiesveld? Formulier IJzerwaren ombouwen tot algemeen formulier met die velden plus productDetails-veld  functie ijzerwaren omgebouwd tot producterbij model product aangepast, model ijzerwaren verwijderd  flashboodschap toevoegen bij product toegevoegd Zorgen dat klanten niet ingelogd hoeven te zijn om een bestelling te plaatsen /geheim aanpassen aan 1 formulier etc voor product erbij en voor categorie erbij    Productcategorieën renderen via een [automatische] query met :categorie. Render die dingen als products in producten.hbs  Links in sidebar daarop aansluiten  producten.hbs gebruiken als view ook voor categorieën Checken of producterbijformulier werkt > jep, extra producten worden ook gerenderd op Alle producten  renderen categorieën werkt (links ook van fugly sidebar die geen sidebar wil zijn), mits categorie met kleine letter is ingevoerd   router.get maken met query voor 1 specifiek product (zie ook addItem!)  Algemene view maken voor 1 product, met alle velden inclusief het grote detailsveld knop toevoegen aan productthumbnails om naar productview te gaan    zorgen dat ie de categorieën ook verwerkt als ze met een hoofdletter worden ingetypt  Netjes de prijs in euro's weergeven en niet in centen...    Links naar /geheim en /shoppingcart deden raar (onterecht redirecten, user/product renderen) > router.get('/:id' etc)  onderaan op pagina gezet :-)   productverwijderknop alleen beschikbaar voor beheerder > als ik alles weer inschakel zou het net zo goed moeten werken als alle andere csrf-shit  product verwijderen uit database    veld voor oude prijs toegevoegd aan producterbij.hbs, product.hbs, producten.hbs, productmodel en functie /producterbij beide prijzen (weer) in nummers veranderd (raar, want dat waren toch ook nummers??)   Winkelwagentje totaalprijs fixen, kennelijk gebeurt daar iets raars  > shoppingcart had nog price ipv prijs :-)   Erachter gekomen wat er gebeurt als ik per ongeluk de terminator sluit terwijl de server nog loopt  Erachter gekomen hoe ik de server van de gesloten terminator permanent kill zodat ik weer console.logs kan lezen ggggffff$%^&#$%%     > het lijkt goed te gaan als ik het proces kill en dan npm start gebruik, maar dan moet ik steeds stoppen en starten      > nodemon gebruiken via npm run dev werkt niet meer, dan zegt ie dat Port 3000 al in gebruik is       > computer herstarten lijkt te helpen Erachter gekomen dat herstarten computer en npm run dev foutmelding UnhandledPromiseRejection oid oplevert, mbt mongoverbinding     > mongo stoppen en starten helpt  .       uitzoeken hoe die flashboodschappen precies werken en die overal toevoegen aan de errorhandling (producterbij oa)     flash versturen (in POST):        req.flash('error', err.message);      // naam flashboodschaparray, de boodschap zelf      flash ontvangen (in GET):       var errMsg = req.flash('error')[0];   // naam array, eerste item      flash renderen (in GET):        res.render('shop/checkout', {total: cart.totalPrice, errMsg: errMsg, noError: !errMsg});      of:       res.render('user/signup', {csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0});      flash renderen (in de hbs):       <div class="alert alert-danger {{#if noError}}hidden{{/if}}" id="charge-error" >          {{errMsg}}        </div>      of (danger voor errors en success voor positieve meldingen):        {{#if hasErrors}}         <div class="alert alert-danger">            {{#each messages }}           <p>{{this}}</p>           {{/each}}         </div>        {{/if}} .   functie schrijven voor dynamisch toevoegen categorieën in de sidebar...   > ik probeerde document.insertAdjacentHTML(etc).    > Computer: "wtf is 'document'"   > internet: "ExpressJS is server side en kan die client side DOM-elementen niet lezen, het moet via req.params"   > maar ik zie dat alleen werken als je iets wilt toevoegen op een bestaande locatie in de hbs, zoals {{variabele}}      of {{{markup}}}, niet als je juist dat stukje wilt toevoegen    > Inmiddels een lijstje met categorieën doorgemaild gekregen van mijn oom en tante, dus ik kan ze er gewoon in hardcoden  .   dat oldUrl-trucje ook toepassen bij /add-to-cart, want als je iets in je karretje gooit, wil je niet van je pagina gegooid worden   > lukte niet, can't read property oldUrl of undefined..., redirect ook door naar /add-to-cart/<vorige pagina>... Zucht. .     
 
-Gepoogd: 
-
-
-Doen: 
+flash toevoegen bij producteraf
 
 /geheim moet puur het inlogscherm worden... of eigenlijk, signin moet de standaard /geheim worden en de rest moet daar
 aan hangen. 
 User (voorlopig) veranderen in geheim
-geheim.js > inhoud verplaatsen naar geheim/profile
-
-flash toevoegen bij producteraf
-
   shop, met alle dingen voor de klant
   /geheim/index, met inlogscherm (en signup in eerste instantie), en uitloglink (die mag wel op navbar? alleen zichtbaar wanneer ingelogd?)
   /geheim/etc, met alle andere dingen (producterbij). Waarbij 'geheim' uiteindelijk iets anders niet-raadbaars moet worden
+geheim.js compleet overbodig maken > inhoud verplaatsen naar geheim/profile
+
+ook plaatje en titel in het productoverzicht veranderen in knop voor product zelf
+
+in producterbijformulier categorieën in een dropdown zetten
+
+in producterbijformulier invoer plaatje aanpassen zodat je bestand uit computer kunt zoeken
+
+Gepoogd: 
+
+zoekfunctie aansluiten
+  > /producten/:categorie renderen denk
+  > zorgen dat ie overal in de beschrijvingen en titels en alles zoekt
+
+categorieën updaten via req.session ipv een globale variant 
+  > computer: "wtf is 'req'"
+  > zou dit niet overkoepelend in app kunnen???
+
+
+
+Doen:
+
+Fixen automatisch renderen van nieuwe categorie in de sidebar
 
 bij product toevoegen zorgen dat je een plaatje uit je eigen computer kunt toevoegen...
+  > YT-filmpje kijken over plaatjes toevoegen in Nodejs
+  > Cloudinaryshit lezen
+.
 
-categorieën dynamisch renderen in sidebar, op een manier dat je dat in iedere pagina kunt zien...
-  > mustache prestatic?
-  > kan dat niet in app??
 
-in app kon je de flashboodschap op iedere pagina weergeven, dat vind ik ook wel chill
+bestellingsformulier verbeteren: 
+-optie om het op te halen en klant niet zijn eigen adres hoeft te geven
+-mailadres OF telefoonnummer, niet per se allebei
 
-voorstel van mijn moeder: categorieën in een dropdown zetten, met mogelijkheid extra categorie toe te voegen...
-  > uitzoeken hoe je dan info post, vanuit zo'n li in een dropdown
-  > check bootstrap voor voorbeelden
 
-checken wat er gebeurt als product toevoegen niet goed gaat > is dan alle data weer weg?
-   > ja > opslaan in local storage
-idealiter: mogelijkheid product te klonen en/of aan te passen
+alle bootstrap classes en IDs verzamelen in CSS-bestand en bijbehorende CSS overnemen (ook de bovenliggende troep)
 
-Regelen hoe dat werkt met zo'n order, die moet te zien zijn voor zowel de klant als voor de verkoper
+producten renderen met flexbox ipv die idiote productChunks want kom op zeg
+
+netjes de producten naast de sidebar renderen ipv eronder...
+
+
+
+
 
 checken of alles nog steeds werkt als ik echt de beveiliging weer aan zet (echte versie isLoggedIn met isAuthenticated)
 
+idealiter: mogelijkheid toevoegen in producterbijformulier om extra categorie toe te voegen...
+
 idealiter moeten R&C ergens eenmalig hun account kunnen aanmaken
 eventuele testinloggegevens verwijderen
+
+idealiter: categorieën dynamisch renderen in sidebar, op een manier dat je dat in iedere pagina kunt zien...
+  > mustache prestatic?
+  > kan dat niet in app??
+.
+
+idealiter: zorgen dat wat er wordt ingevuld in producterbijformulier in localstorage komt te staan
+  > is dat wel nodig als je browser onthoudt wat je de vorige keer in die velden hebt ingevoerd?
+idealiter: mogelijkheid product te klonen en/of aan te passen
 
 
 
@@ -285,9 +311,6 @@ checkout-POST controleren en kijken hoe die nu moet aansluiten op wat er nu in d
 
 afmaken Stripe-functie voor iDeal?
 
-bestellingsformulier verbeteren: 
--optie om het op te halen en klant niet zijn eigen adres hoeft te geven
--mailadres OF telefoonnummer, niet per se allebei
 
 Superprofessionele homepagetekst: "Omdat deze website is gebouwd door ons nichtje - een ongelooflijke amateur die dit voor 
 het eerst doet - en wij evenmin kaas hebben gegeten van automatische berekening van verzendkosten en dergelijke, hebben we 
@@ -297,12 +320,6 @@ met u op over de precieze afhandeling van de bestelling (wanneer afhalen / hoeve
 
 
 //UITERLIJK en overige functies voor uiteindelijke website
-
-hele kaartje in productoverzicht veranderen in knop voor product zelf
-
-producten renderen met flexbox ipv die idiote productChunks want kom op zeg
-
-netjes de producten naast de sidebar renderen ipv eronder...
 
 netjes de prijzen in euro's met komma's weergeven
 
@@ -323,8 +340,30 @@ Kleuren Coendoen:
  #5254a4 #55a darkslateblue hsl(238,33,48) rgb(82,84,164)
 
  #feab00 #fb0 orange hsl(40,100,49) rgb(254,171,0)
-
 .
+
+
+
+
+Realiteit: Coen en Ria hebben heel veel, erg verschillende producten. Van de verwachte schroefjes en spijkertjes tot stickers
+en ketting en installatiedraad en pluggen en veiligheidssloten en soldeerbouten en toebehoren en van die TV/internetkabels 
+aan toe. 
+Van veel dingen hebben ze maar een paar exemplaren, dus dat is veel om in te voeren.
+Sommige dingen gaan per stuk, andere in kavels voor collegaverkopers, weer andere misschien in (starters?)pakketten.
+
+Denk wel dat het een aanrader is overal de daadwerkelijke foto bij te doen - als je die op de overzichtspagina al ziet, 
+ziet de klant ook al meteen de specificaties op de verpakking
+
+Gemene delers: 
+-foto
+-naam product (bijv Spaanplaatschroeven)
+-categorie (bijv IJzerwaren)
+-prijs
+-oude prijs (afgeprijsd van ... !)
+-productdetails (met verder ALLES wat er nog aan onderscheidende dingen te zeggen valt over het product)
+
+Zo'n algemene productdetails is wel het handigst als ze dingen ook op Marktplaats hebben staan - de beschrijving is er dan al, kunnen ze die kopiëren
+
 
 
 
