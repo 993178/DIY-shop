@@ -237,6 +237,8 @@ in producterbijformulier categorieën in een dropdown zetten
 
 in producterbijformulier invoer plaatje aanpassen zodat je bestand uit computer kunt zoeken
 
+bij signin en signup wachtwoordformulier aangepast naar type="password" zodat je bolletjes ziet bij het intypen
+
 Gepoogd: 
 
 zoekfunctie aansluiten
@@ -250,8 +252,6 @@ categorieën updaten via req.session ipv een globale variant
 
 
 Doen:
-
-Fixen automatisch renderen van nieuwe categorie in de sidebar
 
 bij product toevoegen zorgen dat je een plaatje uit je eigen computer kunt toevoegen...
   > YT-filmpje kijken over plaatjes toevoegen in Nodejs
