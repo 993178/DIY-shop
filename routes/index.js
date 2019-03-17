@@ -239,6 +239,8 @@ in producterbijformulier invoer plaatje aanpassen zodat je bestand uit computer 
 
 bij signin en signup wachtwoordformulier aangepast naar type="password" zodat je bolletjes ziet bij het intypen
 
+cloudinary en multer toegevoegd en functies aangepast etc etc mbv YT-tutorial Ian Schoonover voor plaatjes uploaden
+
 Gepoogd: 
 
 zoekfunctie aansluiten
@@ -248,27 +250,28 @@ zoekfunctie aansluiten
 categorieën updaten via req.session ipv een globale variant 
   > computer: "wtf is 'req'"
   > zou dit niet overkoepelend in app kunnen???
+.
 
+netjes de producten naast de sidebar renderen ipv eronder... Grrr.
+
+(even parkeren: Cloudinary-voorbeeld met allerlei andere dingen erin: https://github.com/cloudinary/cloudinaryNodeMongo/blob/master/expressMongoCloud.js)
 
 
 Doen:
 
-bij product toevoegen zorgen dat je een plaatje uit je eigen computer kunt toevoegen...
-  > YT-filmpje kijken over plaatjes toevoegen in Nodejs
-  > Cloudinaryshit lezen
-.
+die dotenv shit... https://youtu.be/RHd4rP9U9SA?t=475 https://www.npmjs.com/package/dotenv 
+  > ik snap niet uit de npmjs-beschrijving waar ik nou wat moet neerzetten van de config en parse
+checken of ik nu plaatjes kan uploaden via producterbij
 
 
 bestellingsformulier verbeteren: 
--optie om het op te halen en klant niet zijn eigen adres hoeft te geven
+-optie om het op te halen zodat klant niet zijn eigen adres hoeft te geven
 -mailadres OF telefoonnummer, niet per se allebei
-
 
 alle bootstrap classes en IDs verzamelen in CSS-bestand en bijbehorende CSS overnemen (ook de bovenliggende troep)
 
 producten renderen met flexbox ipv die idiote productChunks want kom op zeg
 
-netjes de producten naast de sidebar renderen ipv eronder...
 
 
 
@@ -290,6 +293,9 @@ idealiter: zorgen dat wat er wordt ingevuld in producterbijformulier in localsto
   > is dat wel nodig als je browser onthoudt wat je de vorige keer in die velden hebt ingevoerd?
 idealiter: mogelijkheid product te klonen en/of aan te passen
 
+idealiter: producten editen
+  > dus ook foto's vervangen uit de Cloudinary-database
+  > zie deel 2: https://www.youtube.com/watch?v=U0GSOkbHW5o 
 
 
 //BESTELLINGEN
@@ -343,7 +349,7 @@ Kleuren Coendoen:
 .
 
 
-
+========================================================================================
 
 Realiteit: Coen en Ria hebben heel veel, erg verschillende producten. Van de verwachte schroefjes en spijkertjes tot stickers
 en ketting en installatiedraad en pluggen en veiligheidssloten en soldeerbouten en toebehoren en van die TV/internetkabels 
@@ -365,9 +371,11 @@ Gemene delers:
 Zo'n algemene productdetails is wel het handigst als ze dingen ook op Marktplaats hebben staan - de beschrijving is er dan al, kunnen ze die kopiëren
 
 
+Overdracht:   Coentje (Hans??) het cloudinary-account overdragen
+              dat env-bestand moet mee en kan niet via github
 
 
-
+========================================================================================
 
 De volgende keer dat ik per ongeluk de terminal sluit terwijl de server nog loopt: 
 

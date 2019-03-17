@@ -9,6 +9,9 @@ var Order = require('../models/order');
 var Cart = require('../models/cart');
 var Product = require('../models/product');
 var mongoose = require('mongoose');   // maar dit is dan de niet-de-bedoeling-seedermethode?
+var multer = require('multer');
+var cloudinary = require('cloudinary');
+
 mongoose.connect('mongodb://localhost:27017/shopping',  { useNewUrlParser: true });   // seedermethode?
 
 csrfProtection = csrf({ cookie: true });    // poging; () was leeg
@@ -30,17 +33,42 @@ router.get('/profile', isLoggedIn, function(req, res, next) {     // isLoggedIn 
   });
 });
 
+// voor PRODUCTERBIJ
+var storage = multer.diskStorage({
+  filename: function(req, file, callback) {
+    callback(null, Date.now() + file.originalname);
+  }
+});
+var imageFilter = function (req, file, cb) {
+    // accept image files only
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
+        return cb(new Error('Alleen jpg, jpeg, png of gif graag...'), false);
+    }
+    cb(null, true);
+};
+var upload = multer({ storage: storage, fileFilter: imageFilter})
+
+cloudinary.config({ 
+  cloud_name: 'coendoen', 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
 router.get('/producterbij', isLoggedIn, function(req, res, next) { 
   var mislukt = req.flash('nikserbij')[0];
   res.render('geheim/producterbij', {csrfToken: req.csrfToken(), mislukt: mislukt, noNay: !mislukt });
 });
 
-router.post('/producterbij', function(req, res, next) {
+router.post('/producterbij', upload.single('image'), function(req, res, next) {
+  cloudinary.uploader.upload(req.file.path, function(result) {    // dat req.file.path komt van multer
+    req.body.image = result.secure_url;   // we zetten image gelijk aan de veilige url in het cloudinary-object mbt de foto
+  });
+  // hij gebruikt een res.redirect('back') en zegt dat je dan teruggevoerd wordt naar waar je ook was; geen oldUrl-gedoe?!
   var prs = parseFloat(req.body.prijs) / 100;
   var prsOud = parseFloat(req.body.prijsOud) / 100;
   var product = new Product({
     categorie: req.body.categorie,
-    imagePath: req.body.plaatje,
+    imagePath: req.body.image,
     titel: req.body.titel,
     prijs: prs,
     prijsOud: prsOud,
@@ -72,18 +100,7 @@ router.get('/producteraf/:id', isLoggedIn, function(req, res, next) {
   });
 });
 
-
-// > veranderen in functie om bestaande categorieën wel/niet weer te geven (radiobuttons?)
-// router.get('/categorieerbij', isLoggedIn, function(req, res, next) { 
-//   res.render('geheim/categorieerbij', {csrfToken: req.csrfToken()});
-// });
-
-// router.post('/categorieerbij', function(req, res, next) {
-//   var nieuweCategorie = req.body.categorie;
-//   var markup = '<li class="nav-item"><a class="nav-link" href="/producten/{{nieuweCategorie}}"><h4>{{nieuweCategorie}}</h4></a></li>';
-//   //document.getElementById('sidebar-categorylist').insertAdjacentHTML('beforeend', markup);    // okee dat werkt dus niet zo
-// });
-
+// voor IN- EN UITLOGGEN etc
 router.get('/logout', isLoggedIn, function(req, res, next) { 
   req.logout();
   res.redirect('/');

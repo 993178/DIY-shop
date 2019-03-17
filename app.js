@@ -10,6 +10,13 @@ var passport = require('passport');   // voor encryptie
 var flash = require('connect-flash');  // om boodschappen via de view te kunnen doorgeven
 var validator = require('express-validator');
 var MongoStore = require('connect-mongo')(session); // voor het winkelwagentje. Na session importeren, want dat is een argument! Is ipv default 'memoryStore' dat alleen voor development bedoeld is
+require('dotenv').config()  // dit niet in een var?
+
+// const result = dotenv.config()    // moet dit hier??
+// if (result.error) {
+//   throw result.error
+// }
+
 
 var indexRouter = require('./routes/index');  // bij Discount Jonas heet dit routes
 var userRouter = require('./routes/geheim');    // bij Discount Jonas heet dit UserRoutes
