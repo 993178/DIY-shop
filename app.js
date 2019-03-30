@@ -11,6 +11,7 @@ var flash = require('connect-flash');  // om boodschappen via de view te kunnen 
 var validator = require('express-validator');
 var MongoStore = require('connect-mongo')(session); // voor het winkelwagentje. Na session importeren, want dat is een argument! Is ipv default 'memoryStore' dat alleen voor development bedoeld is
 require('dotenv').config()  // dit niet in een var?
+var Product = require('./models/product')
 
 // const result = dotenv.config()    // moet dit hier??
 // if (result.error) {
@@ -74,4 +75,18 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+function updateCategoriesForSideBar(){    // zou dit in app kunnen? Overkoepelend?
+  Product.find().distinct('categorie', function(err, cats) {
+    app.locals.categories = cats 
+    console.log(app.locals)
+  });
+}
+
+updateCategoriesForSideBar()
+
+// app.listen(, () => { console.log('haii', 'listening, on')})
+
+module.exports = { 
+  app,
+  updateCategoriesForSideBar 
+};

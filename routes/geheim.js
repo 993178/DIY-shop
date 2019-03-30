@@ -11,10 +11,25 @@ var Product = require('../models/product');
 var mongoose = require('mongoose');   // maar dit is dan de niet-de-bedoeling-seedermethode?
 var multer = require('multer');
 var cloudinary = require('cloudinary');
+var { updateCategoriesForSideBar } = require('../app')
 
 mongoose.connect('mongodb://localhost:27017/shopping',  { useNewUrlParser: true });   // seedermethode?
 
-csrfProtection = csrf({ cookie: true });    // poging; () was leeg
+var storage = multer.diskStorage({
+  filename: function(req, file, callback) {
+    callback(null, Date.now() + file.originalname);
+  }
+});
+
+var upload = multer({ storage: storage, fileFilter: imageFilter})
+
+cloudinary.config({ 
+  cloud_name: 'coendoen', 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+var csrfProtection = csrf({ cookie: true });    // poging; () was leeg
 //var parseForm = express.urlencoded({ extended: false }) //poging
 router.use(csrfProtection);
 
@@ -34,11 +49,7 @@ router.get('/profile', isLoggedIn, function(req, res, next) {     // isLoggedIn 
 });
 
 // voor PRODUCTERBIJ
-var storage = multer.diskStorage({
-  filename: function(req, file, callback) {
-    callback(null, Date.now() + file.originalname);
-  }
-});
+
 var imageFilter = function (req, file, cb) {
     // accept image files only
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
@@ -46,23 +57,21 @@ var imageFilter = function (req, file, cb) {
     }
     cb(null, true);
 };
-var upload = multer({ storage: storage, fileFilter: imageFilter})
 
-cloudinary.config({ 
-  cloud_name: 'coendoen', 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+
+
 
 router.get('/producterbij', isLoggedIn, function(req, res, next) { 
   var mislukt = req.flash('nikserbij')[0];
   res.render('geheim/producterbij', {csrfToken: req.csrfToken(), mislukt: mislukt, noNay: !mislukt });
 });
 
-router.post('/producterbij', upload.single('image'), function(req, res, next) {
-  cloudinary.uploader.upload(req.file.path, function(result) {    // dat req.file.path komt van multer
-    req.body.image = result.secure_url;   // we zetten image gelijk aan de veilige url in het cloudinary-object mbt de foto
-  });
+// router.post('/producterbij', upload.single('image'), function(req, res, next) {
+router.post('/producterbij', function(req, res, next) {
+  console.log(req.body)
+  // cloudinary.uploader.upload(req.file.path, function(result) {    // dat req.file.path komt van multer
+  //   req.body.image = result.secure_url;   // we zetten image gelijk aan de veilige url in het cloudinary-object mbt de foto
+  // });
   // hij gebruikt een res.redirect('back') en zegt dat je dan teruggevoerd wordt naar waar je ook was; geen oldUrl-gedoe?!
   var prs = parseFloat(req.body.prijs) / 100;
   var prsOud = parseFloat(req.body.prijsOud) / 100;
@@ -82,6 +91,8 @@ router.post('/producterbij', upload.single('image'), function(req, res, next) {
       return res.redirect('/geheim/producterbij');
     }
     
+    updateCategoriesForSideBar()
+
     console.log(ding.titel + " opgeslagen.");
     req.flash('erbij', ding.titel + ' toegevoegd!');
     res.redirect('/geheim/profile');

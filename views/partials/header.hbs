@@ -1,11 +1,10 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="/">Home</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="navbar navbar-expand-lg navbar-light">
+  {{!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
+  </button> --}}
+    <a class="navbar-brand" href="/">Home</a>
+  {{!-- <div class="collapse navbar-collapse" id="navbarSupportedContent"> --}}
+    <ul class="navbar-nav">
       <li class="nav-item active">
         <a class="nav-link" href="/shopping-cart/">
           <i class="fa fa-shopping-cart" aria-hidden="true"></i> Winkelwagentje 
@@ -14,13 +13,13 @@
         </a>
       </li>
       <li class="nav-item active">
-        <a class="nav-link" href="/geheim/profile/">test</a>
+        <a class="nav-link" href="/geheim/profile/">profile</a>
       </li>
       <li class="nav-item active">
-        <a class="nav-link" href="/geheim/index">test login route</a>
+        <a class="nav-link" href="/geheim/index">signin</a>
       </li>
       <li class="nav-item active">
-        <a class="nav-link" href="/geheim/signup">test signup TIJDELIJK</a>
+        <a class="nav-link" href="/geheim/signup">signup</a>
       </li>
 
       {{#if login}}
@@ -28,12 +27,12 @@
         <a class="nav-link" href="/geheim/logout/">Uitloggen</a>
       </li>
       {{/if}}
-      <li>
-        <form action="/producten/:zoekterm" class="form-inline">
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="zoekterm">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Zoeken</button>
+      <li class="nav-item active searchfield">
+        <form action="/producten/search" class="form-inline searchfield__form">
+          <input class="form-control mr-sm-2" type="search" placeholder="Typ een zoekterm" aria-label="Search" name="zoekterm">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Zoek!</button>
         </form>
       </li>
     </ul>
-  </div>
+  {{!-- </div> --}}
 </nav>

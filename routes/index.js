@@ -6,18 +6,18 @@ var Order = require('../models/order');
 
 var categorieën;
 
-function updateCategoriesForSideBar(){    // zou dit in app kunnen? Overkoepelend?
-  Product.find().distinct('categorie', function(err, cats) {
-    categorieën = cats;    
-  });
-}
+// function updateCategoriesForSideBar(){    // zou dit in app kunnen? Overkoepelend?
+//   Product.find().distinct('categorie', function(err, cats) {
+//     categorieën = cats;    
+//   });
+// }
 
-updateCategoriesForSideBar()
+// updateCategoriesForSideBar()
 
 // GET home page
 router.get('/', function(req, res, next) {
   var successMsg = req.flash('success')[0]; // als er net iets is gekocht, willen we de boodschap hier weergeven; de eerste en enige successboodschap die flash standaard in een array stopt
-  res.render('shop/index', { title: 'Coen Doen Doe-het-zelf Outlet', successMsg: successMsg, noMessage: !successMsg, categories: categorieën });  // renderfunctie met te renderen dingen, aangevuld met de products die hier docs heten. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
+  res.render('shop/index', { title: 'Coen Doen Doe-het-zelf Outlet', successMsg: successMsg, noMessage: !successMsg });  // renderfunctie met te renderen dingen, aangevuld met de products die hier docs heten. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
 });
 
 
@@ -29,41 +29,44 @@ router.get('/producten', function(req, res, next) {
     for (var i = 0; i < docs.length; i+= chunkSize) {   // met iedere loop gaan we 3 omhoog: eerst 0, dan 3, dan 6 etc
       productChunks.push(docs.slice(i, i + chunkSize)); // in iedere loop snijden we een brok van 3 stuks uit de docs-array, beginnend bij i, eindigend vóór i + 3, en pushen dat brok in de productChunks-array
     }
-    res.render('shop/producten', { title: 'Shopping cart', products: productChunks, categories: categorieën, gelukt, noYay: !gelukt});  // renderfunctie met te renderen dingen, products is de term in de view, die hier wordt gelijkgesteld met die chunks. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
+    res.render('shop/producten', { title: 'Shopping cart', products: productChunks, gelukt, noYay: !gelukt});  // renderfunctie met te renderen dingen, products is de term in de view, die hier wordt gelijkgesteld met die chunks. Deze moet in de Products.find, anders gebeurt het renderen (synchronous) voordat find (asynchronous) klaar is
   });
 });
 
-
-router.get('/producten/:categorie', function(req, res, next) {
-  req.session.oldUrl = req.url;       // zodat je dingen kunt toevoegen aan je wagentje zonder naar een andere pagina geredirect te worden
-  var categorie = req.params.categorie
-
-  Product.find({ categorie }, function(error, catProducts) {
-    var productChunks = [];
-    var chunkSize = 3;
-    for (var i = 0; i < catProducts.length; i+= chunkSize) {
-      productChunks.push(catProducts.slice(i, i + chunkSize));
-    }
-    res.render('shop/producten', { products: productChunks, noYay: true, categories: categorieën});
-  });
-});
 
 // ZOEKFUNCTIE
-router.get('/producten/:zoekterm', function(req, res, next) {
+router.get('/producten/search', function(req, res, next) {
   console.log('zoeken!');
-  var zoekterm = req.body.zoekterm;
+  var zoekterm = req.query.zoekterm;
   console.log('we zoeken ' + zoekterm);
 
-  Product.find({ zoekterm }, function(error, foundProducts) {   // hoe vertel ik hem dat ie overal moet zoeken naar die term?
+  Product.find({$text: {$search: zoekterm}}, function(error, foundProducts) {   // hoe vertel ik hem dat ie overal moet zoeken naar die term?
+    console.log(error, foundProducts)    
     var productChunks = [];
     var chunkSize = 3;
     for (var i = 0; i < foundProducts.length; i+= chunkSize) {
       productChunks.push(foundProducts.slice(i, i + chunkSize));
     }
-    res.render('shop/producten', { products: productChunks, noYay: true, categories: categorieën});
+    res.render('shop/producten', { products: productChunks, noYay: true });
   });
 
 });
+
+router.get('/producten/:categorie', function(req, res, next) {
+  req.session.oldUrl = req.url;       // zodat je dingen kunt toevoegen aan je wagentje zonder naar een andere pagina geredirect te worden
+  var categorie = req.params.categorie
+
+  Product.find({ categorie: categorie }, function(error, catProducts) {
+    var productChunks = [];
+    var chunkSize = 3;
+    for (var i = 0; i < catProducts.length; i+= chunkSize) {
+      productChunks.push(catProducts.slice(i, i + chunkSize));
+    }
+    res.render('shop/producten', { products: productChunks, noYay: true, });
+  });
+});
+
+
 
 
 // SHOPPING CART
@@ -192,7 +195,7 @@ router.get('/:id', function(req, res, next) {   // moet onderaan want meest alge
     //   //flash iets
     //   return res.redirect('/');
     // }
-    res.render('shop/product', {product, mislukt: mislukt, noNay: !mislukt, categories: categorieën});
+    res.render('shop/product', {product, mislukt: mislukt, noNay: !mislukt, });
   });
 });
 
@@ -247,7 +250,7 @@ zoekfunctie aansluiten
   > /producten/:categorie renderen denk
   > zorgen dat ie overal in de beschrijvingen en titels en alles zoekt
 
-categorieën updaten via req.session ipv een globale variant 
+categorieën updaten via req.huppeldepup? ipv een globale variant 
   > computer: "wtf is 'req'"
   > zou dit niet overkoepelend in app kunnen???
 .
@@ -255,6 +258,8 @@ categorieën updaten via req.session ipv een globale variant
 netjes de producten naast de sidebar renderen ipv eronder... Grrr.
 
 (even parkeren: Cloudinary-voorbeeld met allerlei andere dingen erin: https://github.com/cloudinary/cloudinaryNodeMongo/blob/master/expressMongoCloud.js)
+(https://getbootstrap.com/docs/4.3/components/forms/#file-browser)
+
 
 
 Doen:
@@ -263,6 +268,7 @@ die dotenv shit... https://youtu.be/RHd4rP9U9SA?t=475 https://www.npmjs.com/pack
   > ik snap niet uit de npmjs-beschrijving waar ik nou wat moet neerzetten van de config en parse
 checken of ik nu plaatjes kan uploaden via producterbij
 
+inputformulier in categoriedropdown zetten voor custom andere categorie...
 
 bestellingsformulier verbeteren: 
 -optie om het op te halen zodat klant niet zijn eigen adres hoeft te geven
@@ -348,6 +354,15 @@ Kleuren Coendoen:
  #feab00 #fb0 orange hsl(40,100,49) rgb(254,171,0)
 .
 
+
+Beetje mechanisch maar leesbaar lettertype zoeken voor de koppen etc
+Nog steeds die fokking sidebar NAAST de inhoud krijgen
+Navbar netter indelen met zoekfunctie rechts en andere knoppen links
+Bars kleurtjes geven?
+Flexboxkennis opfrissen, gebruiken voor navbar en voor producten ipv dat chunkgedoe
+Productkaartjes netjes een omtreklijn geven, netter indelen
+Productpagina niet langer laten domineren door de foto... Misschien de foto onderaan? Of maken dat klikken hem in een aparte tab opent op volle grootte?
+Soort van indeling bedenken voor de homepage, denk ik, met een paar in te vullen foto's en een in te vullen tekstje
 
 ========================================================================================
 

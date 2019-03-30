@@ -1,27 +1,11 @@
-    <div class="sidebar">
-        <a class="nav-item nav-link" href="/producten"><h3>Alle producten</h3></a>
+<nav class="sidebar">
+    <a class="nav-item nav-link" href="/producten"><h4>Alle producten</h4></a>
 
-        <ul id="sidebar-categorylist" class="nav flex-column">
-        {{# each categories }}
-            <li class="nav-item">
-                <a class="nav-link" href="/producten/{{.}}"><h4>{{.}}</h4></a>
-            </li>
-        {{/each}}
-        </ul>
-    </div>
-
-
-
-
-{{!-- 
-
-als ik nou hier per li iets van een {{if}} erin gooi die checkt OF product.find(category: [die categorie in die li]) ofzo
-iets oplevert, en hem alleen weergeef als dat meer is dan 0? Dus dan moet ik ergens in de js eerst al een variabele ofzo maken
-die een boolean oplevert, iets van ijzerwarentekoop = ijzerwaren > 0??
-
-Maar dat kan niet in de router.get van diezelfde pagina lijkt me, dat wordt een cirkelredenering.
-
-
-
-
- --}}
+    <ul id="sidebar-categorylist" class="nav flex-column">
+    {{# each categories }}
+        <li class="nav-item">
+            <a class="nav-link" href="/producten/{{.}}"><h5>{{.}}</h5></a>
+        </li>
+    {{/each}}
+    </ul>
+</nav>

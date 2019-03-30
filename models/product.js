@@ -10,6 +10,8 @@ var schema = new Schema({                       // de bouwtekeningen die defini√
     productDetails: { type: String, required: false }       // we doen nog maar even 1 veld
 });
 
+schema.index({'titel': 'text', 'productDetails': 'text', 'categorie': 'text'});
+
 module.exports = mongoose.model('Product', schema); // we exporteren een model 'Product' dat gebaseerd is op dat schema
 
 

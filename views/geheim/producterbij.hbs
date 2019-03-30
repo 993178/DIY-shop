@@ -4,7 +4,8 @@
   </div>
 
 
-<form action="/geheim/producterbij" method="post" enctype="multipart/form-data" id="product-form">
+<form action="/geheim/producterbij?_crsf={{csrfToken}}" method="post" enctype="multipart/form-data" id="product-form">
+{{!-- <form action="/geheim/producterbij" method="post" id="product-form"> --}}
     <div class="row">
         <div class="col-xs-12">
             <div class="form-group">
@@ -18,16 +19,16 @@
                     <option>Sloten</option>
                     <option>Tuingereedschappen</option>
                     <option>Ventilatie</option>
-                    <option>Diversen</option>
+                    {{!-- <option>Anders, namelijk: <input type="text" class="form-control"></option> --}}
                 </select>
             </div>
         </div>
-        <div class="col-xs-12">
+        {{!-- <div class="col-xs-12">
             <div class="form-group">
                 <label for="image">kies foto</label>
                 <input type="file" class="form-control-file" accept="image/*" id="image" name="image">
             </div>
-        </div>
+        </div> --}}
         <div class="col-xs-12">
             <div class="form-group">
                 <label for="titel">Wat is het? Spaanplaatschroef? Sierspijker? Ketting? Slot? Hark? Driepotige lapjeskater?</label>
@@ -53,6 +54,6 @@
             </div>
         </div>
     </div>
-    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    {{!-- <input type="hidden" name="_csrf" value="{{ csrfToken }}"> --}}
     <button type="submit" class="btn btn-success">Opslaan</button>
 </form>
