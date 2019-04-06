@@ -11,12 +11,13 @@ var flash = require('connect-flash');  // om boodschappen via de view te kunnen 
 var validator = require('express-validator');
 var MongoStore = require('connect-mongo')(session); // voor het winkelwagentje. Na session importeren, want dat is een argument! Is ipv default 'memoryStore' dat alleen voor development bedoeld is
 require('dotenv').config()  // dit niet in een var?
-var Product = require('./models/product')
+var updateCategoriesForSideBar = require('./config/sidebar')
 
 // const result = dotenv.config()    // moet dit hier??
 // if (result.error) {
 //   throw result.error
 // }
+
 
 
 var indexRouter = require('./routes/index');  // bij Discount Jonas heet dit routes
@@ -36,6 +37,8 @@ app.set('view engine', '.hbs');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+
 app.use(validator());   // altijd na bodyparser... die we niet hebben... maar die twee regels hierboven met express zijn verder exact hetzelfde als zijn bodyparserregels. Iets met data (uit de UI?) die moeten worden omgezet tot iets waar de validator iets mee kan
 app.use(cookieParser());
 app.use(session({
@@ -75,18 +78,11 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-function updateCategoriesForSideBar(){    // zou dit in app kunnen? Overkoepelend?
-  Product.find().distinct('categorie', function(err, cats) {
-    app.locals.categories = cats 
-    console.log(app.locals)
-  });
-}
 
-updateCategoriesForSideBar()
+updateCategoriesForSideBar(app)
 
 // app.listen(, () => { console.log('haii', 'listening, on')})
 
 module.exports = { 
-  app,
-  updateCategoriesForSideBar 
+  app
 };

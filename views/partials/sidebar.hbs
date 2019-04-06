@@ -1,11 +1,13 @@
 <nav class="sidebar">
-    <a class="nav-item nav-link" href="/producten"><h4>Alle producten</h4></a>
+  <div class="sidebar__container">
+    <a class="nav-item nav-link" href="/producten"><h5>Alle producten</h5></a>
 
     <ul id="sidebar-categorylist" class="nav flex-column">
     {{# each categories }}
         <li class="nav-item">
-            <a class="nav-link" href="/producten/{{.}}"><h5>{{.}}</h5></a>
+            <a class="nav-link" href="/producten/{{.}}">{{.}}</a>
         </li>
     {{/each}}
     </ul>
+  </div>
 </nav>

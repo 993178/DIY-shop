@@ -9,19 +9,21 @@ var Order = require('../models/order');
 var Cart = require('../models/cart');
 var Product = require('../models/product');
 var mongoose = require('mongoose');   // maar dit is dan de niet-de-bedoeling-seedermethode?
-var multer = require('multer');
+var { multerUploads } = require('../config/multer')
+var updateCategoriesForSideBar = require('../config/sidebar')
 var cloudinary = require('cloudinary');
-var { updateCategoriesForSideBar } = require('../app')
 
 mongoose.connect('mongodb://localhost:27017/shopping',  { useNewUrlParser: true });   // seedermethode?
 
-var storage = multer.diskStorage({
-  filename: function(req, file, callback) {
-    callback(null, Date.now() + file.originalname);
-  }
-});
+// var storage = multer.diskStorage({
+//   filename: function(req, file, callback) {
+//     callback(null, Date.now() + file.originalname);
+//   }
+// });
 
-var upload = multer({ storage: storage, fileFilter: imageFilter})
+// var upload = multer({ storage: storage, fileFilter: imageFilter})
+
+
 
 cloudinary.config({ 
   cloud_name: 'coendoen', 
@@ -29,9 +31,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-var csrfProtection = csrf({ cookie: true });    // poging; () was leeg
+// var csrfProtection = csrf({ cookie: true });    // poging; () was leeg
 //var parseForm = express.urlencoded({ extended: false }) //poging
-router.use(csrfProtection);
+// router.use(csrfProtection);
 
 router.get('/profile', isLoggedIn, function(req, res, next) {     // isLoggedIn beschermt deze route; je kunt alleen op /profile komen als je bent ingelogd, zie de functie beneden
   Order.find({user: req.user}, function(err, orders) {            // find: the mongoose way of quering the database, en we zoeken orders met dezelfde user als deze ingelogde user in de req (van passport), waarbij mongoose snugger genoeg is om te beseffen dat ie req.user.id moet hebben
@@ -50,25 +52,27 @@ router.get('/profile', isLoggedIn, function(req, res, next) {     // isLoggedIn 
 
 // voor PRODUCTERBIJ
 
-var imageFilter = function (req, file, cb) {
-    // accept image files only
-    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
-        return cb(new Error('Alleen jpg, jpeg, png of gif graag...'), false);
-    }
-    cb(null, true);
-};
+// var imageFilter = function (req, file, cb) {
+//     // accept image files only
+//     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
+//         return cb(new Error('Alleen jpg, jpeg, png of gif graag...'), false);
+//     }
+//     cb(null, true);
+// };
 
 
 
 
 router.get('/producterbij', isLoggedIn, function(req, res, next) { 
   var mislukt = req.flash('nikserbij')[0];
-  res.render('geheim/producterbij', {csrfToken: req.csrfToken(), mislukt: mislukt, noNay: !mislukt });
+  res.render('geheim/producterbij', { mislukt: mislukt, noNay: !mislukt });
 });
 
 // router.post('/producterbij', upload.single('image'), function(req, res, next) {
-router.post('/producterbij', function(req, res, next) {
-  console.log(req.body)
+router.post('/producterbij', multerUploads,  function(req, res, next) {
+  console.log(req.body, 'BODY')
+  console.log(req.file, 'file')
+
   // cloudinary.uploader.upload(req.file.path, function(result) {    // dat req.file.path komt van multer
   //   req.body.image = result.secure_url;   // we zetten image gelijk aan de veilige url in het cloudinary-object mbt de foto
   // });
@@ -91,7 +95,7 @@ router.post('/producterbij', function(req, res, next) {
       return res.redirect('/geheim/producterbij');
     }
     
-    updateCategoriesForSideBar()
+    updateCategoriesForSideBar(req.app)
 
     console.log(ding.titel + " opgeslagen.");
     req.flash('erbij', ding.titel + ' toegevoegd!');
@@ -124,7 +128,7 @@ router.use('/', notLoggedIn, function(req, res, next) {     // eerst de enige ro
 //   moet er uiteindelijk uit
 router.get('/signup', function(req, res, next) {
   var messages = req.flash('error');    // de boodschap over wachtwoord al in gebruik komt binnen onder de vlag 'error', hier wordt ie 'messages'
-  res.render('geheim/signup', {csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0});  // hasErrors omdat we in die {{ quasi-script }} in de hbs beperkte logicamogelijkheden hebben
+  res.render('geheim/signup', { messages: messages, hasErrors: messages.length > 0});  // hasErrors omdat we in die {{ quasi-script }} in de hbs beperkte logicamogelijkheden hebben
 });
   
 router.post('/signup', passport.authenticate('local.signup', {   // bij aanmaak nieuwe user
@@ -144,7 +148,7 @@ router.post('/signup', passport.authenticate('local.signup', {   // bij aanmaak 
 
 router.get('/index', function(req, res, next) {
   var messages = req.flash('error');    // kopie signup
-  res.render('geheim/index', {csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0});
+  res.render('geheim/index', { messages: messages, hasErrors: messages.length > 0});
 });
   
 router.post('/signin', passport.authenticate('local.signin', {

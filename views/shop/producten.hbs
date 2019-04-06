@@ -4,30 +4,29 @@
     {{gelukt}}
   </div>
 
+<div class="row">
 
 {{# each products }}
-    <div class="row">
 
-        {{# each this }}
         {{!-- this is een hbs-keyword dat verwijst naar het huidige element (hier dus de kortere trioarray) binnen de array die de buitenste each aan het behandelen is. Als ik het goed begrijp tenminste --}}
             <div class="col-sm-6 col-md-4">
                 <div class="thumbnail">
                 <a href="/{{this._id}}"><img src="{{ this.imagePath }}" alt="{{ this.titel }}" class="img-responsive"></a>
                 <div class="caption">
-                    <a href="/{{this._id}}"><h2>{{ this.titel }}</h2></a>
+                    <a href="/{{this._id}}"><h2 class="title" >{{ this.titel }}</h2></a>
                     <div class="clearfix">
-                        <a href="/{{this._id}}"><h4>Afgeprijsd van €{{ this.prijsOud }} nu voor</h4></a>
-                        <div class="price pull-left"><h1>€{{ this.prijs }}</h1></div>
-                        <a href="/add-to-cart/{{this._id}}" class="btn btn-success pull-right" role="button">Gooi in winkelwagen</a>
+                        <a href="/{{this._id}}"><h5 class="old-price" >Was €{{ this.prijsOud }}, nu voor €</h5></a>
+                        <div class="price"><h1>{{ this.prijs }}</h1></div>
+                        <a href="/add-to-cart/{{this._id}}" class="btn btn-success pull-left" role="button">Gooi in winkelwagen</a>
                         <a href="/{{this._id}}" class="btn btn-success pull-right" role="button">Lees meer</a>
                     </div>
                 </div>
                 </div>
             </div>
 
-        {{/each}}
-    </div>
 
 {{/each}}
+</div>
+
 
 </div>

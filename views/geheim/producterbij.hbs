@@ -1,59 +1,60 @@
-<h1>Toevoegen product</h1>
-  <div class="alert alert-danger" {{#if noNay}}hidden{{/if}} id="erbij-failure" >
-    {{mislukt}}
-  </div>
-
-
-<form action="/geheim/producterbij?_crsf={{csrfToken}}" method="post" enctype="multipart/form-data" id="product-form">
-{{!-- <form action="/geheim/producterbij" method="post" id="product-form"> --}}
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="form-group">
-                <label for="categorie">Kies een categorie</label>
-                <select class="form-control" id="exampleFormControlSelect1" name="categorie">
-                    <option>Elektriciteitsbenodigdheden</option>
-                    <option>Gereedschap</option>
-                    <option>Gereedschapaccessoires</option>
-                    <option>Hang- en sluitwerk</option>
-                    <option>IJzerwaren</option>
-                    <option>Sloten</option>
-                    <option>Tuingereedschappen</option>
-                    <option>Ventilatie</option>
-                    {{!-- <option>Anders, namelijk: <input type="text" class="form-control"></option> --}}
-                </select>
-            </div>
-        </div>
-        {{!-- <div class="col-xs-12">
-            <div class="form-group">
-                <label for="image">kies foto</label>
-                <input type="file" class="form-control-file" accept="image/*" id="image" name="image">
-            </div>
-        </div> --}}
-        <div class="col-xs-12">
-            <div class="form-group">
-                <label for="titel">Wat is het? Spaanplaatschroef? Sierspijker? Ketting? Slot? Hark? Driepotige lapjeskater?</label>
-                <input type="text" id="titel" class="form-control" name="titel">
-            </div>
-        </div>
-        <div class="col-xs-12">
-            <div class="form-group">
-                <label for="prijsoud">Oude prijs in centen(!). Afgeprijsd van:</label>
-                <input type="number" id="prijsoud" class="form-control" name="prijsOud">
-            </div>
-        </div>
-        <div class="col-xs-12">
-            <div class="form-group">
-                <label for="prijs">Prijs in centen(!)</label>
-                <input type="number" id="prijs" class="form-control" name="prijs">
-            </div>
-        </div>
-        <div class="col-xs-12">
-            <div class="form-group">
-                <label for="productDetails">productDetails: alles (ALLES) wat relevant is voor de koper en nu nog niet ergens anders staat. Maat, kleur, materiaal, aantal per doosje/eenheid, wat het precies is of andere nadere uitleg, you name it</label>
-                <input type="text" id="productDetails" class="form-control" name="productDetails">
-            </div>
-        </div>
+<div class="producterbij margtop margbot margleft">
+    <h1>Toevoegen product</h1>
+    <div class="alert alert-danger" {{#if noNay}}hidden{{/if}} id="erbij-failure" >
+        {{mislukt}}
     </div>
-    {{!-- <input type="hidden" name="_csrf" value="{{ csrfToken }}"> --}}
-    <button type="submit" class="btn btn-success">Opslaan</button>
-</form>
+
+    <form class="margleft" action="/geheim/producterbij?_crsf={{csrfToken}}" method="post" enctype="multipart/form-data" id="product-form">
+    {{!-- <form action="/geheim/producterbij" method="post" id="product-form"> --}}
+        <div>
+            <div class="col-xs-12">
+                <div class="form-group selectcategory">
+                    <label for="categorie">Kies een categorie</label>
+                    <select class="form-control" id="selectcategorie" name="categorie">
+                        <option>Elektriciteits- benodigdheden</option>
+                        <option>Gereedschap</option>
+                        <option>Gereedschapaccessoires</option>
+                        <option>Hang- en sluitwerk</option>
+                        <option>IJzerwaren</option>
+                        <option>Sloten</option>
+                        <option>Tuingereedschappen</option>
+                        <option>Ventilatie</option>
+                        {{!-- <option>Anders, namelijk: <input type="text" class="form-control"></option> --}}
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label for="image">kies foto</label>
+                    <input type="file" class="form-control-file" accept="image/*" id="image" name="image">
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label for="titel">Wat is het? Spaanplaatschroef? Sierspijker? Ketting? Slot? Hark? Driepotige lapjeskater?</label>
+                    <input type="text" id="titel" class="form-control  title" name="titel">
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label for="prijsoud">Oude prijs in centen(!). Afgeprijsd van:</label>
+                    <input type="number" id="prijsoud" class="form-control old-price" name="prijsOud">
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label for="prijs">Prijs in centen(!)</label>
+                    <input type="number" id="prijs" class="form-control price" name="prijs">
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label for="productDetails">productDetails: alles (ALLES) wat relevant is voor de koper en nu nog niet ergens anders staat. Maat, kleur, materiaal, aantal per doosje/eenheid, wat het precies is of andere nadere uitleg, you name it</label>
+                    <input type="text" id="productDetails" class="form-control productdetails" name="productDetails">
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <button type="submit" class="btn btn-primary">Opslaan</button>
+    </form>
+</div>

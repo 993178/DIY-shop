@@ -1,4 +1,4 @@
-<div class="productweergave">
+<div class="productweergave margleft margbot margtop">
   <div class="alert alert-danger" {{#if noNay}}hidden{{/if}} id="eraf-failure" >
     {{mislukt}}
   </div>
@@ -11,13 +11,13 @@
 <p>{{ product.productDetails }}</p>
 
     <div class="clearfix">
-        <h4>Afgeprijsd van €{{ product.prijsOud }} nu voor</h4>
-        <div class="price pull-left"><h1>€{{ product.prijs }}</h1></div>
-        <a href="/add-to-cart/{{product._id}}" class="btn btn-success pull-right" role="button">Gooi in winkelwagen</a>
-        {{!-- {{#if login}} --}}
-        <a href="/geheim/producteraf/{{product._id}}" class="btn btn-success pull-right" role="button">Verwijder dit product</a>
-        {{!-- {{/if}} --}}
-
-        <p>Categorie: {{ product.categorie }}</p>
+        <h4 class="old-price">Was €{{ product.prijsOud }}, nu voor €</h4>
+        <div class="price"><h1>{{ product.prijs }}</h1></div>
+        <div class="buttons-row">
+          <a href="/add-to-cart/{{product._id}}" class="btn btn-success" role="button">Gooi in winkelwagen</a>
+          {{!-- {{#if login}} --}}
+          <a href="/geheim/producteraf/{{product._id}}" class="btn btn-success" role="button">Verwijder dit product</a>
+          {{!-- {{/if}} --}}
+        </div>
     </div>
 </div>    
