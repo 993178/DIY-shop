@@ -3,8 +3,9 @@ var router = express.Router();
 var Product = require('../models/product');   // productmodel binnenhalen (het schema, niet dat seedergedoe)   
 var Cart = require('../models/cart');
 var Order = require('../models/order');
+var nodemailer = require('nodemailer');
 
-var categorieën;
+//var categorieën;
 
 // function updateCategoriesForSideBar(){    // zou dit in app kunnen? Overkoepelend?
 //   Product.find().distinct('categorie', function(err, cats) {
@@ -175,8 +176,36 @@ router.post('/checkout', function(req, res, next) {   // isLoggedIn > dat je dus
   });
 });
 
-router.get('/dokken', function(req, res, next) {
-  res.render('shop/dokken');
+//nodemailer
+var smtpTransport = nodemailer.createTransport({
+  service: "quicknet",
+  host: "smtp.ziggo.com",
+  auth: {
+      user: "vvlinder@quicknet.nl",
+      pass: process.env.MAILWACHTWOORD    // mijn .env heet geen process?
+  }
+});
+
+//nodemail in plaats van dokken
+router.post('/dokken', function(req, res, next) {
+  console.log('mail sturen?');
+  console.log(req.body);
+  //res.render('shop/dokken');
+  var mailOptions={
+    to : 'cerasifera@quicknet.nl',
+    subject : 'Bestelling via de webshop!',
+    text : req.query.text
+ }
+ console.log(mailOptions);
+ smtpTransport.sendMail(mailOptions, function(error, response){
+ if(error){
+ console.log(error);
+ res.end("error");
+ }else{
+ console.log("Message sent: " + response.message);
+ res.end("sent");
+ }
+ });
 });
 
 
@@ -230,33 +259,41 @@ Gedaan:
 // flash toevoegen bij producteraf   /geheim moet puur het inlogscherm worden... of eigenlijk, signin moet de standaard /geheim worden en de rest moet daar  aan hangen.   User (voorlopig) veranderen in geheim   shop, met alle dingen voor de klant   /geheim/index, met inlogscherm (en signup in eerste instantie), en uitloglink (die mag wel op navbar? alleen zichtbaar wanneer ingelogd?)   /geheim/etc, met alle andere dingen (producterbij). Waarbij 'geheim' uiteindelijk iets anders niet-raadbaars moet worden  geheim.js compleet overbodig maken > inhoud verplaatsen naar geheim/profile   ook plaatje en titel in het productoverzicht veranderen in knop voor product zelf   in producterbijformulier categorieën in een dropdown zetten   in producterbijformulier invoer plaatje aanpassen zodat je bestand uit computer kunt zoeken   bij signin en signup wachtwoordformulier aangepast naar type="password" zodat je bolletjes ziet bij het intypen   cloudinary en multer toegevoegd en functies aangepast etc etc mbv YT-tutorial Ian Schoonover voor plaatjes uploaden   zoekfunctie aansluiten    > /producten/:categorie renderen denk   > zorgen dat ie overal in de beschrijvingen en titels en alles zoekt    categorieën updaten via req.huppeldepup? ipv een globale variant    > computer: "wtf is 'req'"    > zou dit niet overkoepelend in app kunnen??? . 
 // die dotenv shit... https://youtu.be/RHd4rP9U9SA?t=475 https://www.npmjs.com/package/dotenv   > ik snap niet uit de npmjs-beschrijving waar ik nou wat moet neerzetten van de config en parse
 
-alle bootstrap classes en IDs verzamelen in CSS-bestand
-Die fokking sidebar NAAST de inhoud krijgen
-Navbar netter indelen met zoekfunctie rechts en andere knoppen links
-Bars kleurtjes geven
-producterbij netter ingedeeld
-Iets opgeklopt voor de homepage
+// alle bootstrap classes en IDs verzamelen in CSS-bestand
+// Die fokking sidebar NAAST de inhoud krijgen
+// Navbar netter indelen met zoekfunctie rechts en andere knoppen links
+// Bars kleurtjes geven
+// producterbij netter ingedeeld
+// Iets opgeklopt voor de homepage
 
+// idealiter: categorieën dynamisch renderen in sidebar, op een manier dat je dat in iedere pagina kunt zien...
+//   > mustache prestatic?
+//   > kan dat niet in app??
+// .
 
-idealiter: categorieën dynamisch renderen in sidebar, op een manier dat je dat in iedere pagina kunt zien...
-  > mustache prestatic?
-  > kan dat niet in app??
-.
+// producten renderen met flexbox ipv die idiote productChunks want kom op zeg
+//   > docs ipc productChunks: ik krijg allemaal fantoomproducten! Superweird
+
+// de combinatie csrf en cloudinary zien te fixen in producterbij
+
+productDetails in productErbij vervangen door textarea - enter triggert niet langer de submitbutton en er zijn meerdere regels
 
 Gepoogd: 
 
-producten renderen met flexbox ipv die idiote productChunks want kom op zeg
-  > docs ipc productChunks: ik krijg allemaal fantoomproducten! Superweird
 
 Doen:
 
-de combinatie csrf en cloudinary zien te fixen in producterbij
+niet alles door elkaar doen (the struggle is real)
 
-bij producterbij enter disablen voor submitknop, anders kun je niet lekker typen in de invoervelden
+cloudinary/multer verder installeren
 
 checkout puur en alleen maar ombouwen tot een overzicht van de bestellijst, die dan 
   per mail naar zowel de klant als Coen&Ria gestuurd wordt, met de voor hen relevante info. That's it.
 .
+
+
+
+
 
 
 

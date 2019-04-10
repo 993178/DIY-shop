@@ -1,4 +1,20 @@
-<script src="https://js.stripe.com/v3/"></script>
+{{!-- <script src="https://js.stripe.com/v3/"></script> --}}
+{{!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script><script>// <![CDATA[
+$(document).ready(function(){
+    var from,subject,text;
+    $("#send_email").click(function(){      
+        //to=$("#to").val();
+        subject=$("#subject").val();
+        text=$("#content").val();
+        $("#message").text("Sending E-mail...Please wait");
+        $.get("http://localhost:3000/dokken",{subject:subject,text:text},function(data){
+        if(data=="sent")
+        { $("#message").empty().html("Email has been sent at "+to+" . Please check inbox!"); }
+        });
+    });
+});
+</script> --}}
+
 
     <div class="col-sm-6 col-md-4 col-md-offset-4 col-sm-offset-3">
         <h1>Afrekenen</h1>
@@ -9,7 +25,7 @@
         {{!-- rondom de class hidden stond nog {{#if noError}} en {{/if}} --}}
 
 
-        <form action="/checkout" method="post" id="checkout-form">
+        <form action="/dokken" method="POST" id="checkout-form">
             <div class="row">
                 <div class="col-xs-12">
                     <div class="form-group">
@@ -48,7 +64,7 @@
                     </div>
                 </div>
             </div>
-            <a href="/dokken" type="submit" class="btn btn-success">Opslaan, volgende</a>
+            <input type="submit" class="btn btn-success">Opslaan, volgende</input>
         </form>
     </div>
 

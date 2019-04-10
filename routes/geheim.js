@@ -3,7 +3,7 @@
 
 var express = require('express');
 var router = express.Router();
-var csrf = require('csurf');
+//var csrf = require('csurf');
 var passport = require('passport');
 var Order = require('../models/order');
 var Cart = require('../models/cart');
@@ -27,7 +27,7 @@ mongoose.connect('mongodb://localhost:27017/shopping',  { useNewUrlParser: true 
 
 cloudinary.config({ 
   cloud_name: 'coendoen', 
-  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_key: process.env.CLOUDINARY_API_KEY,    // maar, bij mij heet ie .env?
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
